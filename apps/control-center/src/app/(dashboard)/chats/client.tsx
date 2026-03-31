@@ -393,14 +393,18 @@ export function ChatsClient() {
       }
 
       setMessage("");
-      await Promise.all([
-        fetchConversation(selectedConversationId),
-        fetchInbox(page),
-      ]);
-      toast.success("Reply sent");
+      try {
+        await Promise.all([
+          fetchConversation(selectedConversationId),
+          fetchInbox(page),
+        ]);
+      } catch {
+        // Ignore refresh errors — message was sent successfully
+      }
+      toast.success("Message envoyé !");
     } catch (error) {
       console.error(error);
-      toast.error(error instanceof Error ? error.message : "Failed to send reply");
+      toast.error(error instanceof Error ? error.message : "Échec de l'envoi");
     } finally {
       setSending(false);
     }
