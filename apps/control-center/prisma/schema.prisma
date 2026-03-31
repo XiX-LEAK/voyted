@@ -46,8 +46,10 @@ model User {
   accounts      Account[]
   sessions      Session[]
   
-  monitors      monitors[]
-  proxy_groups  proxy_groups[]
+  monitors             monitors[]
+  proxy_groups         proxy_groups[]
+  autoReplyTemplates   AutoReplyTemplate[]
+  relistSchedules      RelistSchedule[]
 }
 
 model VerificationToken {
@@ -115,4 +117,44 @@ model proxy_groups {
   proxies    String    @db.Text
   created_at DateTime? @default(now()) @db.Timestamp(6)
   monitors   monitors[]
+}
+
+model AutoReplyTemplate {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  trigger   String   @default("any")
+  message   String
+  isActive  Boolean  @default(true)
+  delay     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("auto_reply_templates")
+}
+
+model AutoReplyLog {
+  id             String   @id @default(cuid())
+  userId         String
+  conversationId String
+  templateId     String
+  sentAt         DateTime @default(now())
+
+  @@unique([userId, conversationId, templateId])
+  @@map("auto_reply_logs")
+}
+
+model RelistSchedule {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isActive     Boolean   @default(true)
+  intervalDays Int       @default(7)
+  timeOfDay    String    @default("09:00")
+  itemFilter   String    @default("all")
+  lastRunAt    DateTime?
+  nextRunAt    DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@map("relist_schedules")
 }

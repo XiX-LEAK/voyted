@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, PlusCircle, Radio, LogOut, Globe, Shield, User, Star, BookOpen, X, Heart, MessageCircle } from "lucide-react";
+import { LayoutDashboard, PlusCircle, Radio, LogOut, Globe, Shield, User, Star, BookOpen, X, Heart, MessageCircle, Package, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const ACCOUNT_SEEN_KEY = "vintrack:account-tab-seen";
 
 const navItems = [
+  { href: "/stock", label: "Mon Stock", icon: Package },
+  { href: "/ventes", label: "Mes Ventes", icon: ShoppingBag },
   { href: "/dashboard", label: "Monitors", icon: LayoutDashboard },
   { href: "/feed", label: "Live Feed", icon: Radio },
   { href: "/proxies", label: "Proxy Groups", icon: Globe },

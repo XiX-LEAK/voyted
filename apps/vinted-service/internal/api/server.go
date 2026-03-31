@@ -34,6 +34,11 @@ func (s *Server) Start() error {
 	mux.HandleFunc("GET /api/items/liked", s.handleLikedItems)
 	mux.HandleFunc("GET /api/items/favorites", s.handleFavorites)
 
+	mux.HandleFunc("GET /api/items/my-items", s.handleMyItems)
+	mux.HandleFunc("POST /api/items/relist/{id}", s.handleRelistItem)
+	mux.HandleFunc("PATCH /api/items/update/{id}", s.handleUpdateItemPrice)
+	mux.HandleFunc("GET /api/orders/sold", s.handleSoldOrders)
+
 	mux.HandleFunc("GET /api/messages/inbox", s.handleInbox)
 	mux.HandleFunc("GET /api/notifications", s.handleNotifications)
 	mux.HandleFunc("GET /api/messages/conversations/{id}", s.handleConversationReplies)
@@ -42,6 +47,9 @@ func (s *Server) Start() error {
 	mux.HandleFunc("POST /api/offers/send", s.handleSendOffer)
 
 	mux.HandleFunc("POST /api/account/refresh", s.handleRefreshToken)
+
+	mux.HandleFunc("GET /api/items/my-items", s.handleMyItems)
+	mux.HandleFunc("GET /api/orders/sold", s.handleMySoldOrders)
 
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]string{"status": "ok"})
@@ -54,7 +62,7 @@ func (s *Server) Start() error {
 func (s *Server) withMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PATCH, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-User-ID")
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(204)
@@ -664,4 +672,86 @@ func (s *Server) handleRefreshToken(w http.ResponseWriter, r *http.Request) {
 		"vinted_id":   updated.VintedUserID,
 		"domain":      updated.Domain,
 	})
+}
+
+func (s *Server) handleMyItems(w http.ResponseWriter, r *http.Request) {
+	sess, client, ok := s.getSessionAndClient(r, w)
+	if !ok {
+		return
+	}
+
+	if err := client.WarmUp(); err != nil {
+		log.Printf("[my-items] warmup warning: %v", err)
+	}
+
+	page := r.URL.Query().Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	url := fmt.Sprintf("https://%s/api/v2/users/%d/items?page=%s&per_page=100&order=newest_first", sess.Domain, sess.VintedUserID, page)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		writeError(w, "failed to create request", 500)
+		return
+	}
+	req.Header = client.GetAPIHeaders()
+
+	httpClient := &http.Client{Timeout: 15 * time.Second}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		writeError(w, "request failed: "+err.Error(), 502)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	log.Printf("[my-items] GET /api/v2/users/%d/items -> %d", sess.VintedUserID, resp.StatusCode)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(resp.StatusCode)
+	w.Write(body)
+
+	s.persistIfRefreshed(sess, client)
+}
+
+func (s *Server) handleMySoldOrders(w http.ResponseWriter, r *http.Request) {
+	sess, client, ok := s.getSessionAndClient(r, w)
+	if !ok {
+		return
+	}
+
+	if err := client.WarmUp(); err != nil {
+		log.Printf("[sold-orders] warmup warning: %v", err)
+	}
+
+	page := r.URL.Query().Get("page")
+	if page == "" {
+		page = "1"
+	}
+
+	url := fmt.Sprintf("https://%s/api/v2/my_orders?type=sold&page=%s&per_page=50", sess.Domain, page)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		writeError(w, "failed to create request", 500)
+		return
+	}
+	req.Header = client.GetAPIHeaders()
+
+	httpClient := &http.Client{Timeout: 15 * time.Second}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		writeError(w, "request failed: "+err.Error(), 502)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	log.Printf("[sold-orders] GET /api/v2/my_orders -> %d", resp.StatusCode)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(resp.StatusCode)
+	w.Write(body)
+
+	s.persistIfRefreshed(sess, client)
 }

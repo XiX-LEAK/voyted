@@ -1463,3 +1463,8 @@ func (c *Client) doSendOffer(itemID, sellerID int64, price string, currency stri
 
 	return fmt.Errorf("send offer failed (HTTP %d): %s", resp2.StatusCode, truncate(bodyStr2, 300))
 }
+
+// GetAPIHeaders exposes the internal apiHeaders for use outside this package
+func (c *Client) GetAPIHeaders() http.Header {
+	return c.apiHeaders()
+}
