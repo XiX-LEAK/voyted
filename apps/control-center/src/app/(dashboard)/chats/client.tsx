@@ -733,10 +733,15 @@ export function ChatsClient() {
                   <textarea
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
-                    placeholder="Write your reply..."
+                    placeholder="Écrire un message..."
                     rows={3}
                     className="w-full resize-none border-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                     maxLength={2000}
+                    spellCheck={false}
+                    autoCorrect="off"
+                    autoComplete="off"
+                    translate="no"
+                    suppressHydrationWarning
                   />
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <p className="text-xs text-muted-foreground">
