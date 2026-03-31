@@ -1,0 +1,136 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: vintrack_caddy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - control-center
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: vintrack_db
+    environment:
+      POSTGRES_USER: vinuser
+      POSTGRES_PASSWORD: vinpassword
+      POSTGRES_DB: vintrack
+    ports:
+      - "127.0.0.1:5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vinuser -d vintrack"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+  redis:
+    image: redis:7-alpine
+    container_name: vintrack_redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru --stop-writes-on-bgsave-error no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  control-center:
+    build:
+      context: ./apps/control-center
+      dockerfile: Dockerfile
+    image: ghcr.io/jakobaiodev/vintrack-vinted-monitor/control-center:latest
+    container_name: vintrack_control_center
+    environment:
+      - DATABASE_URL=postgresql://vinuser:vinpassword@postgres:5432/vintrack
+      - REDIS_URL=redis://redis:6379
+      - AUTH_SECRET=${AUTH_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - AUTH_TRUST_HOST=true
+      - AUTH_URL=${AUTH_URL:-http://localhost:3000}
+      - VINTED_SERVICE_URL=http://vinted-service:4000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      control-center-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  control-center-migrate:
+    build:
+      context: ./apps/control-center
+      dockerfile: Dockerfile
+      target: migrate
+    container_name: vintrack_migrate
+    environment:
+      - DATABASE_URL=postgresql://vinuser:vinpassword@postgres:5432/vintrack
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  vinted-service:
+    build:
+      context: ./apps/vinted-service
+      dockerfile: Dockerfile
+    image: ghcr.io/jakobaiodev/vintrack-vinted-monitor/vinted-service:latest
+    container_name: vintrack_vinted
+    environment:
+      - REDIS_ADDR=redis:6379
+      - REDIS_PASSWORD=
+      - LISTEN_ADDR=:4000
+    ports:
+      - "127.0.0.1:4000:4000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ./apps/worker
+      dockerfile: Dockerfile
+    image: ghcr.io/jakobaiodev/vintrack-vinted-monitor/worker:latest
+    container_name: vintrack_worker
+    environment:
+      - DATABASE_URL=postgres://vinuser:vinpassword@postgres:5432/vintrack?sslmode=disable
+      - REDIS_ADDR=redis:6379
+      - REDIS_PASSWORD=
+      - CHECK_INTERVAL_MS=1500
+      - PROXY_FILE=/app/proxies.txt
+      - ENRICH_SELLER_INFO=${ENRICH_SELLER_INFO:-true}
+      - CLIENT_POOL_SIZE=${CLIENT_POOL_SIZE:-5}
+      - RACE_FETCHERS=${RACE_FETCHERS:-2}
+    volumes:
+      - ./apps/worker/proxies.txt:/app/proxies.txt
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      control-center-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  caddy_data:
+  caddy_config:
