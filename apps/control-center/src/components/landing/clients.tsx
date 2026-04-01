@@ -1,5 +1,39 @@
+const VINTED_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjQ5IiB6b29tQW5kUGFuPSJtYWduaWZ5IiB2aWV3Qm94PSIwIDAgMTg2Ljc1IDYwIiBoZWlnaHQ9IjgwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB2ZXJzaW9uPSIxLjAiPjxkZWZzPjxjbGlwUGF0aCBpZD0iNDViNjcwMDViZCI+PHBhdGggZD0iTSAxLjE1MjM0NCAwLjAzOTA2MjUgTCAxODUuNDA2MjUgMC4wMzkwNjI1IEwgMTg1LjQwNjI1IDU5Ljk1NzAzMSBMIDEuMTUyMzQ0IDU5Ljk1NzAzMSBaIE0gMS4xNTIzNDQgMC4wMzkwNjI1ICIgY2xpcC1ydWxlPSJub256ZXJvIi8+PC9jbGlwUGF0aD48L2RlZnM+PGcgY2xpcC1wYXRoPSJ1cmwoIzQ1YjY3MDA1YmQpIj48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNIDM4LjA3MDMxMiAwLjI1IEMgMzcuNDM3NSAwLjI1IDM2LjY3MTg3NSAwLjc4NTE1NiAzNC42MDE1NjIgMi41ODU5MzggQyAzMy44NjcxODggMi44NTE1NjIgMzMuMDY2NDA2IDIuNjUyMzQ0IDMyLjEzMjgxMiA0LjA4NTkzOCBDIDI2Ljg2MzI4MSAxMS42NTYyNSAyMi43NjE3MTkgMzkuOTcyNjU2IDE5LjI2MTcxOSA0OC4xNDQ1MzEgQyAxOC41NTg1OTQgNDQuNjA5Mzc1IDE3LjA5Mzc1IDIxLjU5Mzc1IDE2LjUyMzQzOCAxNS4yOTI5NjkgQyAxNi40NTcwMzEgMTQuMTI1IDE2LjU4OTg0NCAxMi42NTYyNSAxNi41ODk4NDQgMTEuNzkyOTY5IEMgMTYuNTg5ODQ0IDUuOTg4MjgxIDE1LjMyODEyNSAzLjA1MDc4MSA5LjUxOTUzMSAzLjA1MDc4MSBDIDYuNTg1OTM4IDMuMDUwNzgxIDMuNjg3NSA0LjEyMTA5NCAyLjE1MjM0NCA2LjA1NDY4OCBDIDEuNDE3OTY5IDcuMDU0Njg4IDEuMTUyMzQ0IDcuNzg5MDYyIDEuMTUyMzQ0IDkuNTg5ODQ0IEMgMS4xNTIzNDQgMjEuNjI4OTA2IDQuMDE5NTMxIDQxLjM3MTA5NCA3LjIyMjY1NiA1NC4yNDYwOTQgQyA4LjIyMjY1NiA1OC4yODEyNSAxMS44MjQyMTkgNTkuMDQ2ODc1IDE1LjIyNjU2MiA1OS4wNDY4NzUgQyAxNi44MjgxMjUgNTkuMDQ2ODc1IDE4LjQyNTc4MSA1OC44NDc2NTYgMjAuNjk1MzEyIDU3LjcxNDg0NCBDIDI4LjU2MjUgNTMuODc1IDMwLjY2Nzk2OSA0My40MDYyNSAzMi43MDMxMjUgMzMuMjM0Mzc1IEMgMzMuMDY2NDA2IDMxLjM5ODQzOCAzNC45MDIzNDQgMjIuNTI3MzQ0IDM1Ljc2OTUzMSAxNy44NTkzNzUgQyAzNi45Mzc1IDExLjQ4ODI4MSAzOC4yNjk1MzEgNC4yODUxNTYgMzkuMDcwMzEyIDEuNjUyMzQ0IEMgMzkuMzM1OTM4IDAuODUxNTYyIDM4LjgzNTkzOCAwLjI1IDM4LjA3NDIxOSAwLjI1IFogTSAxNzEuNzM4MjgxIDI5LjA2NjQwNiBDIDE3MC42NzE4NzUgMzcuMDM1MTU2IDE2Ni42MDE1NjIgNTAuNjc5Njg4IDE2Mi4wNjY0MDYgNTAuNjc5Njg4IEMgMTYwLjc2NTYyNSA1MC42Nzk2ODggMTYwLjEwMTU2MiA0OS4xNzU3ODEgMTYwLjEwMTU2MiA0Ny4zMzk4NDQgQyAxNjAuMTAxNTYyIDQyLjEwNTQ2OSAxNjMuNjMyODEyIDMxLjYzNjcxOSAxNzEuNzM4MjgxIDI5LjA2NjQwNiBaIE0gMTg1LjI4MTI1IDMuODUxNTYyIEMgMTg1LjI4MTI1IDIuNDUzMTI1IDE4NC40MTQwNjIgMS4yMTg3NSAxODIuNDQ1MzEyIDEuMjE4NzUgQyAxODAuODQzNzUgMS4yMTg3NSAxNzguOTc2NTYyIDIuMDE1NjI1IDE3Ny44MDg1OTQgMy4wMTk1MzEgQyAxNzYuNDEwMTU2IDIuNjg3NSAxNzQuNTM5MDYyIDMuNzUgMTc0LjMwODU5NCA1LjAxOTUzMSBDIDE3My4xMDU0NjkgMTAuNjU2MjUgMTcyLjU3NDIxOSAxNi41MjM0MzggMTcxLjkwNjI1IDIxLjM2MzI4MSBaIE0gNTEuODc4OTA2IDE4LjIyNjU2MiBDIDU0LjQ4MDQ2OSAxOC4yMjY1NjIgNTYuNjEzMjgxIDE2LjA5Mzc1IDU2LjYxMzI4MSAxMy43NTc4MTIgQyA1Ni42MTMyODEgMTAuNjkxNDA2IDU1LjY3OTY4OCA3Ljc1NzgxMiA1Mi4yMTA5MzggNy43NTc4MTIgQyA0OS44NDM3NSA3Ljc1NzgxMiA0NS43NDIxODggMTAuNDIxODc1IDQ1Ljc0MjE4OCAxMi43MjY1NjIgQyA0NS43NDIxODggMTUuNDI1NzgxIDQ4LjcxMDkzOCAxOC4yMjY1NjIgNTEuODc4OTA2IDE4LjIyNjU2MiBaIiBmaWxsLW9wYWNpdHk9IjEiIGZpbGwtcnVsZT0ibm9uemVybyIvPjwvZz48L3N2Zz4=";
+
 export function LandingClients() {
   return (
+    <>
+      {/* Glow effect + logos — exact Vinteer style avec couleur blanche */}
+      <div
+        className="pointer-events-none relative -z-[2] mx-auto h-[50rem] overflow-hidden my-[-20.8rem]"
+        style={{
+          maskImage: "radial-gradient(ellipse at center center, #000, transparent 50%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center center, #000, transparent 50%)",
+          opacity: 1,
+          transform: "none",
+        }}
+      >
+        {/* Radial glow blanc (pas vert) */}
+        <div
+          className="absolute inset-0 h-full w-full opacity-40"
+          style={{ backgroundImage: "radial-gradient(circle at bottom center, rgba(255,255,255,0.8), transparent 70%)" }}
+        />
+        {/* Ellipse arc */}
+        <div
+          className="absolute top-1/2 -left-1/2 w-[200%] rounded-[50%] border-t"
+          style={{
+            aspectRatio: "1/0.7",
+            borderColor: "rgba(255,255,255,0.08)",
+            background: "#080808",
+          }}
+        />
+        {/* Logos inside glow */}
+        <div className="absolute inset-0 flex items-center justify-center gap-10 pt-32">
+          <img alt="Vinted" width="224" height="120" className="h-12 w-44 px-2 brightness-0 invert" src={VINTED_LOGO} style={{ color: "transparent" }} />
+          <img alt="Vinted" width="224" height="120" className="h-12 w-44 px-2 brightness-0 invert opacity-60" src={VINTED_LOGO} style={{ color: "transparent" }} />
+        </div>
+      </div>
+
     <section id="clients" className="text-center mx-auto max-w-[80rem] px-6 md:px-8">
       <div className="py-14">
         <div className="mx-auto max-w-screen-xl px-4 md:px-8">
@@ -29,5 +63,7 @@ export function LandingClients() {
         </div>
       </div>
     </section>
+    </>
   );
 }
+
