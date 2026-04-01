@@ -3,35 +3,30 @@ const VINTED_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53M
 export function LandingClients() {
   return (
     <>
-      {/* Glow effect + logos — exact Vinteer style avec couleur blanche */}
+      {/* Glow halo — exact Vinteer style, couleur blanche */}
       <div
-        className="pointer-events-none relative -z-[2] mx-auto h-[50rem] overflow-hidden my-[-20.8rem]"
+        className="pointer-events-none relative -z-[2] mx-auto h-[50rem] overflow-hidden my-[-20.8rem] before:absolute before:inset-0 before:h-full before:w-full before:opacity-40 after:absolute after:-left-1/2 after:top-1/2 after:w-[200%] after:rounded-[50%] after:border-t"
         style={{
           maskImage: "radial-gradient(ellipse at center center, #000, transparent 50%)",
           WebkitMaskImage: "radial-gradient(ellipse at center center, #000, transparent 50%)",
           opacity: 1,
-          transform: "none",
-        }}
+          ["--before-bg" as string]: "radial-gradient(circle at bottom center, rgba(255,255,255,0.9), transparent 70%)",
+        } as React.CSSProperties}
       >
-        {/* Radial glow blanc (pas vert) */}
+        {/* Glow blanc */}
         <div
           className="absolute inset-0 h-full w-full opacity-40"
-          style={{ backgroundImage: "radial-gradient(circle at bottom center, rgba(255,255,255,0.8), transparent 70%)" }}
+          style={{ backgroundImage: "radial-gradient(circle at bottom center, rgba(255,255,255,0.95), transparent 65%)" }}
         />
-        {/* Ellipse arc */}
+        {/* Arc ellipse */}
         <div
-          className="absolute top-1/2 -left-1/2 w-[200%] rounded-[50%] border-t"
+          className="absolute -left-1/2 top-1/2 w-[200%] rounded-[50%] border-t"
           style={{
             aspectRatio: "1/0.7",
-            borderColor: "rgba(255,255,255,0.08)",
+            borderColor: "rgba(255,255,255,0.1)",
             background: "#080808",
           }}
         />
-        {/* Logos inside glow */}
-        <div className="absolute inset-0 flex items-center justify-center gap-10 pt-32">
-          <img alt="Vinted" width="224" height="120" className="h-12 w-44 px-2 brightness-0 invert" src={VINTED_LOGO} style={{ color: "transparent" }} />
-          <img alt="Vinted" width="224" height="120" className="h-12 w-44 px-2 brightness-0 invert opacity-60" src={VINTED_LOGO} style={{ color: "transparent" }} />
-        </div>
       </div>
 
     <section id="clients" className="text-center mx-auto max-w-[80rem] px-6 md:px-8">
