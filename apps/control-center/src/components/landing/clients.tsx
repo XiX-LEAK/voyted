@@ -3,33 +3,7 @@ const VINTED_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53M
 export function LandingClients() {
   return (
     <>
-      {/* Glow halo blanc */}
-      <div className="pointer-events-none relative mx-auto overflow-hidden" style={{ height: "260px", marginBottom: "-180px" }}>
-        {/* Glow blanc centré en bas */}
-        <div style={{
-          position: "absolute",
-          bottom: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "700px",
-          height: "220px",
-          background: "radial-gradient(ellipse at center bottom, rgba(255,255,255,0.18) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }} />
-        {/* Arc ellipse */}
-        <div style={{
-          position: "absolute",
-          bottom: 0,
-          left: "50%",
-          transform: "translateX(-50%) translateY(50%)",
-          width: "900px",
-          height: "380px",
-          borderRadius: "50%",
-          border: "1px solid rgba(255,255,255,0.07)",
-          background: "transparent",
-          pointerEvents: "none",
-        }} />
-      </div>
+
 
     <section id="clients" className="text-center mx-auto max-w-[80rem] px-6 md:px-8">
       <div className="py-14">
