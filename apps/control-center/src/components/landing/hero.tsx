@@ -11,23 +11,10 @@ export function LandingHero() {
           <span className="hidden sm:block">Le logiciel de gestion<br />Vinted pour les pros</span>
         </h1>
 
-        {/* Description row */}
-        <div className="flex items-start justify-between gap-8">
-          <p style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif", fontSize: "15px", lineHeight: 1.65, color: "rgba(255,255,255,0.45)", maxWidth: "340px" }}>
-            Conçu pour les vendeurs Vinted. Automatise ta gestion, suis tes marges réelles et scale ton business d&apos;achat-revente.
-          </p>
-          <Link href="#features" className="hidden items-center gap-3 md:flex" style={{ textDecoration: "none" }}>
-            <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#18CB96", boxShadow: "0 0 0 3px rgba(24,203,150,0.2)", animation: "pulse 2s infinite", flexShrink: 0 }} />
-            <span style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif", fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>L&apos;extension Chrome est morte</span>
-            <span style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif", fontSize: "13px", color: "rgba(255,255,255,0.25)" }}>voyted.app/token →</span>
-          </Link>
-        </div>
-
-        {/* CTA */}
-        <div className="mt-8 flex items-center gap-3">
-          <Link href="/register" className="inline-flex h-9 items-center rounded-[7px] px-4 text-[13px] font-semibold text-black transition-opacity hover:opacity-90" style={{ background: "#ffffff" }}>Commencer gratuitement</Link>
-          <Link href="/login" className="inline-flex h-9 items-center rounded-[7px] px-4 text-[13px] font-medium transition-colors" style={{ color: "rgba(255,255,255,0.55)", border: "1px solid rgba(255,255,255,0.1)" }}>Se connecter</Link>
-        </div>
+        {/* Description */}
+        <p style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif", fontSize: "15px", lineHeight: 1.65, color: "rgba(255,255,255,0.45)", maxWidth: "460px" }}>
+          Conçu pour les vendeurs Vinted. Automatise ta gestion, suis tes marges réelles et scale ton business d&apos;achat-revente.
+        </p>
       </div>
 
       {/* Frame — exact Linear layout */}
