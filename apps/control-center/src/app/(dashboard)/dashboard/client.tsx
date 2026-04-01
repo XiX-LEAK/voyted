@@ -101,7 +101,7 @@ export function DashboardClient({
     setIsTestingWebhook(true);
     const result = await testDiscordWebhook(webhookInput);
     setIsTestingWebhook(false);
-    
+
     if (result.error) {
       toast.error(result.error);
     } else {
@@ -202,10 +202,10 @@ export function DashboardClient({
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="text-lg font-semibold tracking-tight text-foreground">
             Welcome back, {userName}
           </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-foreground/48 mt-0.5">
             Manage and monitor your Vinted scrapers.
           </p>
         </div>
@@ -213,10 +213,10 @@ export function DashboardClient({
         <div className="flex items-center gap-2 w-full sm:w-auto">
           {activeCount > 0 && (
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handleStopAll}
-              className="flex-1 sm:flex-none gap-1.5 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/20 hover:bg-red-50 dark:hover:bg-red-500/10 dark:bg-transparent hover:text-red-700"
+              className="flex-1 sm:flex-none gap-1.5 text-red-500 hover:text-red-400 hover:bg-red-500/10"
             >
               <StopCircle className="w-3.5 h-3.5" /> Stop All
             </Button>
@@ -230,16 +230,16 @@ export function DashboardClient({
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-border/75 bg-card/80 px-5 py-4 shadow-sm backdrop-blur">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        <div className="rounded-xl border border-border/50 bg-card px-5 py-4">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-foreground/36">
             Total Monitors
           </p>
           <p className="mt-1 text-2xl font-bold text-foreground">
             {monitors.length}
           </p>
         </div>
-        <div className="rounded-xl border border-border/75 bg-card/80 px-5 py-4 shadow-sm backdrop-blur">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        <div className="rounded-xl border border-border/50 bg-card px-5 py-4">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-foreground/36">
             Active
           </p>
           <div className="flex items-center gap-2 mt-1">
@@ -252,8 +252,8 @@ export function DashboardClient({
             )}
           </div>
         </div>
-        <div className="rounded-xl border border-border/75 bg-card/80 px-5 py-4 shadow-sm backdrop-blur">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        <div className="rounded-xl border border-border/50 bg-card px-5 py-4">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-foreground/36">
             Items Found
           </p>
           <p className="mt-1 text-2xl font-bold text-foreground">
@@ -263,14 +263,14 @@ export function DashboardClient({
       </div>
 
       {monitors.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/80 bg-card/75 py-20 shadow-sm backdrop-blur">
+        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border/50 bg-card py-20">
           <div className="mb-4 rounded-xl bg-muted p-3">
-            <Radio className="w-6 h-6 text-muted-foreground" />
+            <Radio className="w-6 h-6 text-foreground/24" />
           </div>
           <h3 className="text-base font-semibold text-foreground">
             No monitors yet
           </h3>
-          <p className="mb-4 mt-1 text-sm text-muted-foreground">
+          <p className="mb-4 mt-1 text-sm text-foreground/48">
             Create your first monitor to start finding deals.
           </p>
           <Link href="/monitors/new">
@@ -284,13 +284,13 @@ export function DashboardClient({
           {sortedMonitors.map((m) => (
             <Card
               key={m.id}
-              className="group flex flex-col overflow-hidden border-border/75 bg-card/85 transition-colors hover:border-border hover:bg-card"
+              className="group flex flex-col overflow-hidden border-border/50 bg-card transition-colors hover:border-border hover:bg-card"
             >
               <CardContent className="p-5 flex flex-col flex-1">
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="min-w-0 flex-1">
                     <h3
-                      className="truncate text-[15px] font-semibold text-foreground"
+                      className="truncate text-[15px] font-semibold text-foreground/90"
                       title={m.query}
                     >
                       {m.query}
@@ -305,7 +305,7 @@ export function DashboardClient({
                             ? "border-emerald-500/20 bg-emerald-500/12 text-emerald-400 hover:bg-emerald-500/18"
                             : m.status === "error"
                               ? "border-red-500/20 bg-red-500/12 text-red-400"
-                              : "bg-muted text-muted-foreground"
+                              : "bg-muted text-foreground/48"
                         }`}
                       >
                         {m.status === "active" ? (
@@ -323,12 +323,12 @@ export function DashboardClient({
                         )}
                       </Badge>
                       {m.price_max && (
-                        <span className="text-[11px] text-muted-foreground">
+                        <span className="text-[11px] text-foreground/48">
                           Max {m.price_max}€
                         </span>
                       )}
                       {m.region && m.region && (
-                        <span className="text-[11px] text-muted-foreground">
+                        <span className="text-[11px] text-foreground/48">
                           {getRegionLabel(m.region)}
                         </span>
                       )}
@@ -337,7 +337,7 @@ export function DashboardClient({
                   <div className="flex items-center gap-0.5 shrink-0">
                     <Link href={`/monitors/${m.id}/edit`}>
                       <button
-                        className="rounded-md p-1.5 text-muted-foreground/55 transition-colors hover:bg-accent hover:text-accent-foreground"
+                        className="rounded-md p-1.5 text-foreground/32 transition-colors hover:bg-accent/40 hover:text-foreground/72"
                         title="Edit monitor"
                       >
                         <Pencil className="w-3.5 h-3.5" />
@@ -345,13 +345,13 @@ export function DashboardClient({
                     </Link>
                     <button
                       onClick={() => openWebhookDialog(m)}
-                      className="rounded-md p-1.5 text-muted-foreground/55 transition-colors hover:bg-accent hover:text-accent-foreground"
+                      className="rounded-md p-1.5 text-foreground/32 transition-colors hover:bg-accent/40 hover:text-foreground/72"
                       title="Configure webhook"
                     >
                       <Webhook
                         className={`w-3.5 h-3.5 ${
                           m.discord_webhook && m.webhook_active
-                            ? "text-indigo-400"
+                            ? "text-foreground/72"
                             : ""
                         }`}
                       />
@@ -363,7 +363,7 @@ export function DashboardClient({
                   <div className="flex flex-wrap gap-1 mb-3">
                     {m.allowed_countries && (
                       <span
-                        className="inline-flex items-center rounded-md border border-emerald-500/20 bg-emerald-500/12 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500"
+                        className="inline-flex items-center rounded-md border border-border/30 bg-accent/40 px-1.5 py-0.5 text-[10px] font-medium text-foreground/72"
                         title={`Only items from: ${m.allowed_countries}`}
                       >
                         {getRegionFlags(m.allowed_countries).join(" ")}
@@ -373,7 +373,7 @@ export function DashboardClient({
                       getCategoryLabels(m.catalog_ids).map((label) => (
                         <span
                           key={`cat-${label}`}
-                          className="inline-flex items-center rounded-md border border-violet-500/20 bg-violet-500/12 px-1.5 py-0.5 text-[10px] font-medium text-violet-400"
+                          className="inline-flex items-center rounded-md border border-border/30 bg-accent/40 px-1.5 py-0.5 text-[10px] font-medium text-foreground/48"
                         >
                           {label}
                         </span>
@@ -382,7 +382,7 @@ export function DashboardClient({
                       getBrandLabels(m.brand_ids).map((label) => (
                         <span
                           key={`brand-${label}`}
-                          className="inline-flex items-center rounded-md border border-blue-500/20 bg-blue-500/12 px-1.5 py-0.5 text-[10px] font-medium text-blue-400"
+                          className="inline-flex items-center rounded-md border border-border/30 bg-accent/40 px-1.5 py-0.5 text-[10px] font-medium text-foreground/48"
                         >
                           {label}
                         </span>
@@ -391,7 +391,7 @@ export function DashboardClient({
                       getColorLabels(m.color_ids).map((label) => (
                         <span
                           key={`color-${label}`}
-                          className="inline-flex items-center rounded-md border border-pink-500/20 bg-pink-500/12 px-1.5 py-0.5 text-[10px] font-medium text-pink-400"
+                          className="inline-flex items-center rounded-md border border-border/30 bg-accent/40 px-1.5 py-0.5 text-[10px] font-medium text-foreground/48"
                         >
                           {label}
                         </span>
@@ -400,7 +400,7 @@ export function DashboardClient({
                       getSizeLabels(m.size_id).map((label) => (
                         <span
                           key={`size-${label}`}
-                          className="inline-flex items-center rounded-md border border-amber-500/20 bg-amber-500/12 px-1.5 py-0.5 text-[10px] font-medium text-amber-400"
+                          className="inline-flex items-center rounded-md border border-border/30 bg-accent/40 px-1.5 py-0.5 text-[10px] font-medium text-foreground/48"
                         >
                           {label}
                         </span>
@@ -410,26 +410,26 @@ export function DashboardClient({
 
                 <div className="flex-1" />
 
-                <div className="mb-1.5 flex items-center gap-1.5 text-[13px] text-muted-foreground">
-                  <Package className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span className="font-medium text-foreground">
+                <div className="mb-1.5 flex items-center gap-1.5 text-[13px] text-foreground/48">
+                  <Package className="w-3.5 h-3.5 text-foreground/32" />
+                  <span className="font-medium text-foreground/90">
                     {m._count.items.toLocaleString()}
                   </span>
                   items found
                 </div>
 
-                <div className="mb-2 flex items-center gap-1.5 text-[13px] text-muted-foreground">
+                <div className="mb-2 flex items-center gap-1.5 text-[13px] text-foreground/48">
                   {m.proxy_group_name ? (
                     <>
-                      <Globe className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span className="truncate font-medium text-foreground" title={m.proxy_group_name}>
+                      <Globe className="w-3.5 h-3.5 text-foreground/32" />
+                      <span className="truncate font-medium text-foreground/90" title={m.proxy_group_name}>
                         {m.proxy_group_name}
                       </span>
                     </>
                   ) : (
                     <>
-                      <Zap className="w-3.5 h-3.5 text-amber-400" />
-                      <span className="font-medium text-amber-600 dark:text-amber-400">
+                      <Zap className="w-3.5 h-3.5 text-foreground/32" />
+                      <span className="font-medium text-foreground/72">
                         Server Proxies
                       </span>
                     </>
@@ -442,15 +442,15 @@ export function DashboardClient({
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 border-t border-border/70 pt-3">
+                <div className="flex items-center gap-2 border-t border-border/30 pt-3">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleToggle(m.id, m.status)}
                     className={`h-8 px-3 text-xs font-medium ${
                       m.status === "active"
-                        ? "text-amber-400 hover:bg-amber-500/10 hover:text-amber-300"
-                        : "text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
+                        ? "text-foreground/48 hover:bg-accent/40 hover:text-foreground/72"
+                        : "text-foreground/48 hover:bg-accent/40 hover:text-foreground/72"
                     }`}
                   >
                     {m.status === "active" ? (
@@ -468,7 +468,7 @@ export function DashboardClient({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 gap-1 px-3 text-xs font-medium text-muted-foreground hover:text-foreground"
+                      className="h-8 gap-1 px-3 text-xs font-medium text-foreground/48 hover:text-foreground/72"
                     >
                       View <ArrowRight className="w-3 h-3" />
                     </Button>
@@ -519,7 +519,7 @@ export function DashboardClient({
             </div>
 
             {webhookInput.length > 0 && (
-              <div className="flex items-center justify-between space-x-2 rounded-lg border border-border/80 bg-muted/45 p-3">
+              <div className="flex items-center justify-between space-x-2 rounded-xl border border-border/50 bg-accent/40 p-3">
                 <div className="flex flex-col space-y-0.5">
                   <Label
                     htmlFor="active-mode"
@@ -527,7 +527,7 @@ export function DashboardClient({
                   >
                     Enable Notifications
                   </Label>
-                  <span className="text-[12px] text-muted-foreground">
+                  <span className="text-[12px] text-foreground/48">
                     Pause notifications without deleting the URL.
                   </span>
                 </div>
@@ -555,8 +555,9 @@ export function DashboardClient({
 
           <DialogFooter>
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => setIsWebhookOpen(false)}
+              className="text-foreground/48 hover:text-foreground/72"
             >
               Cancel
             </Button>

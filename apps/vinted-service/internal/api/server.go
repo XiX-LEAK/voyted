@@ -36,8 +36,12 @@ func (s *Server) Start() error {
 
 	mux.HandleFunc("GET /api/items/my-items", s.handleMyItems)
 	mux.HandleFunc("POST /api/items/relist/{id}", s.handleRelistItem)
+	mux.HandleFunc("POST /api/items/repost/{id}", s.handleRepostItem)
 	mux.HandleFunc("PATCH /api/items/update/{id}", s.handleUpdateItemPrice)
-	mux.HandleFunc("GET /api/orders/sold", s.handleSoldOrders)
+
+	mux.HandleFunc("POST /api/items/like-all", s.handleLikeAll)
+
+	mux.HandleFunc("GET /api/orders/sold", s.handleMySoldOrders)
 
 	mux.HandleFunc("GET /api/messages/inbox", s.handleInbox)
 	mux.HandleFunc("GET /api/notifications", s.handleNotifications)
@@ -47,9 +51,7 @@ func (s *Server) Start() error {
 	mux.HandleFunc("POST /api/offers/send", s.handleSendOffer)
 
 	mux.HandleFunc("POST /api/account/refresh", s.handleRefreshToken)
-
-	mux.HandleFunc("GET /api/items/my-items", s.handleMyItems)
-	mux.HandleFunc("GET /api/orders/sold", s.handleMySoldOrders)
+	mux.HandleFunc("GET /api/account/analyze", s.handleAnalyzeAccount)
 
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]string{"status": "ok"})
@@ -148,9 +150,10 @@ func (s *Server) getSessionAndClient(r *http.Request, w http.ResponseWriter) (*s
 }
 
 type linkRequest struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	Domain       string `json:"domain"`
+	AccessToken    string `json:"access_token"`
+	RefreshToken   string `json:"refresh_token"`
+	DatadomeCookie string `json:"datadome_cookie"`
+	Domain         string `json:"domain"`
 }
 
 func (s *Server) handleLink(w http.ResponseWriter, r *http.Request) {
@@ -176,13 +179,14 @@ func (s *Server) handleLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sess := session.VintedSession{
-		UserID:       userID,
-		AccessToken:  req.AccessToken,
-		RefreshToken: req.RefreshToken,
-		Domain:       req.Domain,
-		Status:       "active",
-		LinkedAt:     time.Now().UTC().Format(time.RFC3339),
-		LastCheck:    time.Now().UTC().Format(time.RFC3339),
+		UserID:         userID,
+		AccessToken:    req.AccessToken,
+		RefreshToken:   req.RefreshToken,
+		DatadomeCookie: req.DatadomeCookie,
+		Domain:         req.Domain,
+		Status:         "active",
+		LinkedAt:       time.Now().UTC().Format(time.RFC3339),
+		LastCheck:      time.Now().UTC().Format(time.RFC3339),
 	}
 
 	client, err := vinted.NewClient(&sess)
@@ -680,39 +684,140 @@ func (s *Server) handleMyItems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := client.WarmUp(); err != nil {
-		log.Printf("[my-items] warmup warning: %v", err)
-	}
-
 	page := r.URL.Query().Get("page")
 	if page == "" {
 		page = "1"
 	}
 
-	url := fmt.Sprintf("https://%s/api/v2/users/%d/items?page=%s&per_page=100&order=newest_first", sess.Domain, sess.VintedUserID, page)
-	req, err := http.NewRequest("GET", url, nil)
+	data, statusCode, err := client.GetMyItems(sess.VintedUserID, page)
 	if err != nil {
-		writeError(w, "failed to create request", 500)
+		writeError(w, "failed to fetch items: "+err.Error(), 502)
 		return
 	}
-	req.Header = client.GetAPIHeaders()
-
-	httpClient := &http.Client{Timeout: 15 * time.Second}
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		writeError(w, "request failed: "+err.Error(), 502)
-		return
-	}
-	defer resp.Body.Close()
-
-	body, _ := io.ReadAll(resp.Body)
-	log.Printf("[my-items] GET /api/v2/users/%d/items -> %d", sess.VintedUserID, resp.StatusCode)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(resp.StatusCode)
-	w.Write(body)
 
 	s.persistIfRefreshed(sess, client)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(data)
+}
+
+func (s *Server) handleRelistItem(w http.ResponseWriter, r *http.Request) {
+	sess, client, ok := s.getSessionAndClient(r, w)
+	if !ok {
+		return
+	}
+
+	itemID, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil || itemID == 0 {
+		writeError(w, "invalid item id", 400)
+		return
+	}
+
+	newID, err := client.RelistItem(itemID)
+	if err != nil {
+		writeError(w, "relist failed: "+err.Error(), 502)
+		return
+	}
+
+	s.persistIfRefreshed(sess, client)
+
+	log.Printf("[relist] item %d -> %d for user %s", itemID, newID, getUserID(r))
+	writeJSON(w, 200, map[string]interface{}{
+		"status":      "relisted",
+		"old_item_id": itemID,
+		"new_item_id": newID,
+	})
+}
+
+type repostRequest struct {
+	ItemID      int64 `json:"item_id"`
+	Orientation int   `json:"orientation"`
+	AsDraft     bool  `json:"as_draft"`
+}
+
+func (s *Server) handleRepostItem(w http.ResponseWriter, r *http.Request) {
+	sess, client, ok := s.getSessionAndClient(r, w)
+	if !ok {
+		return
+	}
+
+	itemID, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil || itemID == 0 {
+		writeError(w, "invalid item id", 400)
+		return
+	}
+
+	var req repostRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		// Defaults: orientation=0, as_draft=true
+	}
+
+	orientation := req.Orientation
+	if orientation < 0 || orientation > 3 {
+		orientation = 0
+	}
+
+	newID, err := client.RepostItem(itemID, orientation, req.AsDraft)
+	if err != nil {
+		writeError(w, "repost failed: "+err.Error(), 502)
+		return
+	}
+
+	s.persistIfRefreshed(sess, client)
+
+	log.Printf("[repost] item %d -> %d (draft=%v, orientation=%d) for user %s", itemID, newID, req.AsDraft, orientation, getUserID(r))
+	writeJSON(w, 200, map[string]interface{}{
+		"status":      "reposted",
+		"old_item_id": itemID,
+		"new_item_id": newID,
+		"as_draft":    req.AsDraft,
+	})
+}
+
+type updatePriceRequest struct {
+	Price    string `json:"price"`
+	Currency string `json:"currency"`
+}
+
+func (s *Server) handleUpdateItemPrice(w http.ResponseWriter, r *http.Request) {
+	sess, client, ok := s.getSessionAndClient(r, w)
+	if !ok {
+		return
+	}
+
+	itemID, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil || itemID == 0 {
+		writeError(w, "invalid item id", 400)
+		return
+	}
+
+	var req updatePriceRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, "invalid request body", 400)
+		return
+	}
+	if req.Price == "" {
+		writeError(w, "price is required", 400)
+		return
+	}
+	if req.Currency == "" {
+		req.Currency = "EUR"
+	}
+
+	if err := client.UpdateItemPrice(itemID, req.Price, req.Currency); err != nil {
+		writeError(w, "failed to update price: "+err.Error(), 502)
+		return
+	}
+
+	s.persistIfRefreshed(sess, client)
+
+	log.Printf("[update-price] item %d -> %s %s for user %s", itemID, req.Price, req.Currency, getUserID(r))
+	writeJSON(w, 200, map[string]interface{}{
+		"status":  "updated",
+		"item_id": itemID,
+		"price":   req.Price,
+	})
 }
 
 func (s *Server) handleMySoldOrders(w http.ResponseWriter, r *http.Request) {
@@ -721,37 +826,145 @@ func (s *Server) handleMySoldOrders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := client.WarmUp(); err != nil {
-		log.Printf("[sold-orders] warmup warning: %v", err)
-	}
-
 	page := r.URL.Query().Get("page")
 	if page == "" {
 		page = "1"
 	}
 
-	url := fmt.Sprintf("https://%s/api/v2/my_orders?type=sold&page=%s&per_page=50", sess.Domain, page)
-	req, err := http.NewRequest("GET", url, nil)
+	data, statusCode, err := client.GetMySoldOrders(page)
 	if err != nil {
-		writeError(w, "failed to create request", 500)
+		writeError(w, "failed to fetch orders: "+err.Error(), 502)
 		return
 	}
-	req.Header = client.GetAPIHeaders()
-
-	httpClient := &http.Client{Timeout: 15 * time.Second}
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		writeError(w, "request failed: "+err.Error(), 502)
-		return
-	}
-	defer resp.Body.Close()
-
-	body, _ := io.ReadAll(resp.Body)
-	log.Printf("[sold-orders] GET /api/v2/my_orders -> %d", resp.StatusCode)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(resp.StatusCode)
-	w.Write(body)
 
 	s.persistIfRefreshed(sess, client)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(data)
+}
+
+func (s *Server) handleAnalyzeAccount(w http.ResponseWriter, r *http.Request) {
+	_, client, ok := s.getSessionAndClient(r, w)
+	if !ok {
+		return
+	}
+
+	userIDStr := r.URL.Query().Get("user_id")
+	if userIDStr == "" {
+		writeError(w, "user_id query parameter is required", 400)
+		return
+	}
+
+	userID, err := strconv.ParseInt(userIDStr, 10, 64)
+	if err != nil || userID <= 0 {
+		writeError(w, "invalid user_id", 400)
+		return
+	}
+
+	// Fetch user profile
+	userInfo, err := client.GetUserProfile(userID)
+	if err != nil {
+		writeError(w, "failed to fetch user profile: "+err.Error(), 502)
+		return
+	}
+
+	// Fetch user items (wardrobe) — get RAW data for deep analysis
+	itemsData, _, err := client.GetMyItems(userID, "1")
+	if err != nil {
+		log.Printf("[analyze] failed to fetch items for user %d: %v", userID, err)
+		writeJSON(w, 200, map[string]interface{}{
+			"user":        userInfo,
+			"items":       []interface{}{},
+			"items_count": 0,
+		})
+		return
+	}
+
+	// Pass raw items JSON to client for deep analysis
+	var rawItems map[string]interface{}
+	if err := json.Unmarshal(itemsData, &rawItems); err != nil {
+		rawItems = map[string]interface{}{"items": []interface{}{}}
+	}
+
+	items, _ := rawItems["items"].([]interface{})
+	if items == nil {
+		items = []interface{}{}
+	}
+
+	// Also try to fetch user feedback
+	var feedback interface{}
+	feedbackData, statusCode, feedbackErr := client.GetUserFeedback(userID)
+	if feedbackErr == nil && statusCode == 200 {
+		var fb interface{}
+		if json.Unmarshal(feedbackData, &fb) == nil {
+			feedback = fb
+		}
+	}
+
+	writeJSON(w, 200, map[string]interface{}{
+		"user":        userInfo,
+		"items":       items,
+		"items_count": len(items),
+		"feedback":    feedback,
+	})
+}
+
+type likeAllRequest struct {
+	UserID int64 `json:"user_id"`
+}
+
+func (s *Server) handleLikeAll(w http.ResponseWriter, r *http.Request) {
+	sess, client, ok := s.getSessionAndClient(r, w)
+	if !ok {
+		return
+	}
+
+	var req likeAllRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.UserID == 0 {
+		writeError(w, "user_id is required", 400)
+		return
+	}
+
+	// Fetch user's wardrobe items
+	itemsData, _, err := client.GetMyItems(req.UserID, "1")
+	if err != nil {
+		writeError(w, "failed to fetch wardrobe: "+err.Error(), 502)
+		return
+	}
+
+	var itemsResp struct {
+		Items []struct {
+			ID int64 `json:"id"`
+		} `json:"items"`
+	}
+	if err := json.Unmarshal(itemsData, &itemsResp); err != nil {
+		writeError(w, "failed to parse wardrobe items", 500)
+		return
+	}
+
+	liked := 0
+	failed := 0
+	callerID := getUserID(r)
+
+	for _, item := range itemsResp.Items {
+		if err := client.LikeItem(item.ID); err != nil {
+			log.Printf("[like-all] failed to like item %d: %v", item.ID, err)
+			failed++
+		} else {
+			liked++
+			_ = s.sessions.AddLike(callerID, item.ID)
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	s.persistIfRefreshed(sess, client)
+
+	log.Printf("[like-all] user %s liked %d/%d items from wardrobe %d", callerID, liked, len(itemsResp.Items), req.UserID)
+	writeJSON(w, 200, map[string]interface{}{
+		"status": "done",
+		"liked":  liked,
+		"failed": failed,
+		"total":  len(itemsResp.Items),
+	})
 }

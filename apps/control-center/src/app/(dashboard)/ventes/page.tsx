@@ -1,4 +1,4 @@
-import { Metadata } from "next";
-import { VentesWrapper } from "./wrapper";
-export const metadata: Metadata = { title: "Mes Ventes | Voyted" };
-export default function VentesPage() { return <VentesWrapper />; }
+import { redirect } from "next/navigation";
+export default function Page() {
+  redirect("/inventaire?tab=ventes");
+}

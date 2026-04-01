@@ -41,9 +41,9 @@ type UserRow = {
 };
 
 const ROLES = [
-  { value: "free", label: "Free", icon: User, color: "bg-muted text-muted-foreground" },
-  { value: "premium", label: "Premium", icon: Crown, color: "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400" },
-  { value: "admin", label: "Admin", icon: Shield, color: "bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400" },
+  { value: "free", label: "Free", icon: User, color: "bg-muted text-foreground/48" },
+  { value: "premium", label: "Premium", icon: Crown, color: "bg-foreground/8 text-foreground/72" },
+  { value: "admin", label: "Admin", icon: Shield, color: "bg-foreground/8 text-foreground/72" },
 ] as const;
 
 function getRoleBadge(role: string) {
@@ -122,85 +122,85 @@ export function AdminClient({
     <div className="space-y-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight">
+          <h1 className="mt-3 text-lg font-semibold tracking-tight text-foreground">
             User Management
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-foreground/48">
             Search users, review access levels, and update roles from one place.
           </p>
         </div>
 
         <div className="w-full max-w-sm">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/32" />
             <Input
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Search by name, email or role..."
-              className="h-10 rounded-xl border-border/60 bg-card pl-9"
+              className="h-10 rounded-xl border-border/50 bg-card pl-9"
             />
           </div>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="border-border/60 bg-linear-to-br from-card to-muted/30 py-0">
+        <Card className="border-border/50 bg-card py-0">
           <CardHeader className="pb-3 pt-3">
             <div className="flex items-center justify-between">
-              <CardDescription>Total Users</CardDescription>
-              <div className="rounded-lg bg-primary/10 p-2 text-primary">
-                <Users className="h-4 w-4" />
+              <CardDescription className="text-foreground/48">Total Users</CardDescription>
+              <div className="rounded-lg bg-accent/60 p-2">
+                <Users className="h-4 w-4 text-foreground/32" />
               </div>
             </div>
-            <CardTitle className="text-3xl">{totalUsers}</CardTitle>
+            <CardTitle className="text-3xl text-foreground">{totalUsers}</CardTitle>
           </CardHeader>
-          <CardContent className="pb-6 text-xs text-muted-foreground">
+          <CardContent className="pb-6 text-xs text-foreground/48">
             Active accounts visible in this workspace.
           </CardContent>
         </Card>
 
-        <Card className="border-amber-200/70 bg-linear-to-br from-amber-50 to-card py-0 dark:border-amber-500/20 dark:from-amber-500/10">
+        <Card className="border-border/50 bg-card py-0">
           <CardHeader className="pb-3 pt-3">
             <div className="flex items-center justify-between">
-              <CardDescription>Premium</CardDescription>
-              <div className="rounded-lg bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
-                <Crown className="h-4 w-4" />
+              <CardDescription className="text-foreground/48">Premium</CardDescription>
+              <div className="rounded-lg bg-accent/60 p-2">
+                <Crown className="h-4 w-4 text-foreground/32" />
               </div>
             </div>
-            <CardTitle className="text-3xl text-amber-600 dark:text-amber-400">
+            <CardTitle className="text-3xl text-foreground">
               {premiumUsers}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-6 text-xs text-muted-foreground">
+          <CardContent className="pb-6 text-xs text-foreground/48">
             Users with access to server proxy features.
           </CardContent>
         </Card>
 
-        <Card className="border-red-200/70 bg-linear-to-br from-red-50 to-card py-0 dark:border-red-500/20 dark:from-red-500/10">
+        <Card className="border-border/50 bg-card py-0">
           <CardHeader className="pb-3 pt-3">
             <div className="flex items-center justify-between">
-              <CardDescription>Admins</CardDescription>
-              <div className="rounded-lg bg-red-500/10 p-2 text-red-600 dark:text-red-400">
-                <Sparkles className="h-4 w-4" />
+              <CardDescription className="text-foreground/48">Admins</CardDescription>
+              <div className="rounded-lg bg-accent/60 p-2">
+                <Sparkles className="h-4 w-4 text-foreground/32" />
               </div>
             </div>
-            <CardTitle className="text-3xl text-red-600 dark:text-red-400">
+            <CardTitle className="text-3xl text-foreground">
               {adminUsers}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-6 text-xs text-muted-foreground">
+          <CardContent className="pb-6 text-xs text-foreground/48">
             Full dashboard access including role management.
           </CardContent>
         </Card>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-border/60 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="overflow-hidden rounded-xl border border-border/50 bg-card">
+        <div className="flex flex-col gap-3 border-b border-border/30 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-foreground">
               Team Members
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-foreground/48">
               {filteredUsers.length} of {totalUsers} users shown
             </p>
           </div>
@@ -208,7 +208,7 @@ export function AdminClient({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 self-start px-2 text-xs sm:self-auto"
+              className="h-8 self-start px-2 text-xs text-foreground/48 hover:text-foreground/72 sm:self-auto"
               onClick={() => setSearchQuery("")}
             >
               Clear search
@@ -217,30 +217,30 @@ export function AdminClient({
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-muted/30">
-              <tr className="border-b border-border">
-                <th className="text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">
+            <thead>
+              <tr className="border-b border-border/30">
+                <th className="text-left text-[11px] font-medium text-foreground/36 uppercase tracking-wider px-5 py-3">
                   User
                 </th>
-                <th className="text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">
+                <th className="text-left text-[11px] font-medium text-foreground/36 uppercase tracking-wider px-5 py-3">
                   Role
                 </th>
-                <th className="text-center text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">
+                <th className="text-center text-[11px] font-medium text-foreground/36 uppercase tracking-wider px-5 py-3">
                   Monitors
                 </th>
-                <th className="text-center text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">
+                <th className="text-center text-[11px] font-medium text-foreground/36 uppercase tracking-wider px-5 py-3">
                   Proxy Groups
                 </th>
-                <th className="text-right text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-5 py-3">
+                <th className="text-right text-[11px] font-medium text-foreground/36 uppercase tracking-wider px-5 py-3">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/50">
+            <tbody>
               {filteredUsers.map((user) => (
                 <tr
                   key={user.id}
-                  className="transition-colors hover:bg-muted/40"
+                  className="border-t border-border/30 transition-colors hover:bg-accent/40"
                 >
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-3">
@@ -251,15 +251,15 @@ export function AdminClient({
                           className="h-10 w-10 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-xs font-bold text-foreground/48">
                           {user.name?.[0]?.toUpperCase() ?? "?"}
                         </div>
                       )}
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">
+                        <p className="text-sm font-medium text-foreground/90 truncate">
                           {user.name ?? "Unknown"}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="text-xs text-foreground/48 truncate">
                           {user.email ?? "—"}
                         </p>
                       </div>
@@ -267,14 +267,14 @@ export function AdminClient({
                   </td>
                   <td className="px-5 py-3.5">{getRoleBadge(user.role)}</td>
                   <td className="px-5 py-3.5 text-center">
-                    <span className="inline-flex items-center gap-1 text-sm text-foreground">
-                      <Monitor className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="inline-flex items-center gap-1 text-sm text-foreground/90">
+                      <Monitor className="w-3.5 h-3.5 text-foreground/32" />
                       {user._count.monitors}
                     </span>
                   </td>
                   <td className="px-5 py-3.5 text-center">
-                    <span className="inline-flex items-center gap-1 text-sm text-foreground">
-                      <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="inline-flex items-center gap-1 text-sm text-foreground/90">
+                      <Globe className="w-3.5 h-3.5 text-foreground/32" />
                       {user._count.proxy_groups}
                     </span>
                   </td>
@@ -282,15 +282,15 @@ export function AdminClient({
                     {user.id === currentUserId ? (
                       <Badge
                         variant="outline"
-                        className="rounded-full text-[10px] uppercase tracking-wide"
+                        className="rounded-full text-[10px] uppercase tracking-wide border-border/50 text-foreground/48"
                       >
                         You
                       </Badge>
                     ) : (
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
-                        className="h-8 rounded-lg text-xs"
+                        className="h-8 rounded-lg text-xs text-foreground/48 hover:text-foreground/72"
                         onClick={() => openRoleDialog(user)}
                       >
                         Change Role
@@ -306,13 +306,13 @@ export function AdminClient({
                     className="px-5 py-12 text-center"
                   >
                     <div className="mx-auto flex max-w-sm flex-col items-center gap-2">
-                      <div className="rounded-full bg-muted p-3 text-muted-foreground">
-                        <Search className="h-5 w-5" />
+                      <div className="rounded-full bg-muted p-3">
+                        <Search className="h-5 w-5 text-foreground/24" />
                       </div>
                       <p className="text-sm font-medium text-foreground">
                         No users match your search
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-foreground/48">
                         Try a different name, email address, or role.
                       </p>
                     </div>
@@ -338,38 +338,38 @@ export function AdminClient({
               <button
                 key={role.value}
                 onClick={() => setPendingRole(role.value)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg border text-left transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-colors ${
                   pendingRole === role.value
-                    ? "border-primary bg-primary/10"
-                    : "border-border hover:border-primary/50 hover:bg-muted"
+                    ? "border-foreground/24 bg-accent"
+                    : "border-border/50 hover:border-foreground/24 hover:bg-accent/40"
                 }`}
               >
                 <role.icon
                   className={`w-5 h-5 ${
                     pendingRole === role.value
-                      ? "text-primary"
-                      : "text-muted-foreground"
+                      ? "text-foreground/72"
+                      : "text-foreground/32"
                   }`}
                 />
                 <div>
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="text-sm font-medium text-foreground/90">
                     {role.label}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-foreground/48">
                     {role.value === "free" && "Standard access, must use own proxies"}
                     {role.value === "premium" && "Can use server proxies"}
                     {role.value === "admin" && "Full access + user management"}
                   </p>
                 </div>
                 {pendingRole === role.value && (
-                  <div className="ml-auto w-2 h-2 rounded-full bg-primary" />
+                  <div className="ml-auto w-2 h-2 rounded-full bg-foreground" />
                 )}
               </button>
             ))}
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsOpen(false)}>
+            <Button variant="ghost" onClick={() => setIsOpen(false)} className="text-foreground/48 hover:text-foreground/72">
               Cancel
             </Button>
             <Button onClick={handleSave}>Save</Button>

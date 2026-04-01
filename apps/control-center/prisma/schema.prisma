@@ -50,6 +50,11 @@ model User {
   proxy_groups         proxy_groups[]
   autoReplyTemplates   AutoReplyTemplate[]
   relistSchedules      RelistSchedule[]
+  scheduledPosts       ScheduledPost[]
+  restockRules         RestockRule[]
+  smartOfferRules      SmartOfferRule[]
+  messageTemplates     MessageTemplate[]
+  vintedAccounts       VintedAccount[]
 }
 
 model VerificationToken {
@@ -157,4 +162,70 @@ model RelistSchedule {
   createdAt    DateTime  @default(now())
 
   @@map("relist_schedules")
+}
+
+model ScheduledPost {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId      Int?
+  title       String?
+  scheduledAt DateTime
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
+  @@map("scheduled_posts")
+}
+
+model RestockRule {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemTitle   String
+  stockCount  Int      @default(1)
+  autoRepost  Boolean  @default(true)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  @@map("restock_rules")
+}
+
+model SmartOfferRule {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name             String
+  isActive         Boolean  @default(true)
+  minAcceptPercent Int      @default(80)
+  counterPercent   Int      @default(90)
+  autoAccept       Boolean  @default(false)
+  autoCounter      Boolean  @default(true)
+  declinePercent   Int      @default(50)
+  minPrice         Float?
+  maxPrice         Float?
+  createdAt        DateTime @default(now())
+  @@map("smart_offer_rules")
+}
+
+model MessageTemplate {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  category  String   @default("general")
+  message   String
+  createdAt DateTime @default(now())
+  @@map("message_templates")
+}
+
+model VintedAccount {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label          String
+  vintedUsername  String?
+  vintedUserId   Int?
+  domain         String   @default("www.vinted.fr")
+  isActive       Boolean  @default(true)
+  isPrimary      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  @@map("vinted_accounts")
 }

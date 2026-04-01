@@ -1,6 +1,7 @@
 package vinted
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -34,6 +35,7 @@ func NewClient(sess *session.VintedSession) (*Client, error) {
 	options := []tls_client.HttpClientOption{
 		tls_client.WithTimeoutSeconds(15),
 		tls_client.WithClientProfile(profiles.Chrome_131),
+		tls_client.WithRandomTLSExtensionOrder(),
 		tls_client.WithCookieJar(jar),
 	}
 
@@ -47,13 +49,21 @@ func NewClient(sess *session.VintedSession) (*Client, error) {
 
 func (c *Client) injectAuthCookie() {
 	domainURL, _ := url.Parse(fmt.Sprintf("https://%s/", c.session.Domain))
-	c.httpClient.SetCookies(domainURL, []*http.Cookie{
+	cookies := []*http.Cookie{
 		{
 			Name:  "access_token_web",
 			Value: c.session.AccessToken,
 			Path:  "/",
 		},
-	})
+	}
+	if c.session.DatadomeCookie != "" {
+		cookies = append(cookies, &http.Cookie{
+			Name:  "datadome",
+			Value: c.session.DatadomeCookie,
+			Path:  "/",
+		})
+	}
+	c.httpClient.SetCookies(domainURL, cookies)
 }
 
 func (c *Client) apiHeaders() http.Header {
@@ -177,9 +187,15 @@ func (c *Client) WarmUp() error {
 
 	domainURL, _ := url.Parse(fmt.Sprintf("https://%s/", c.session.Domain))
 	for _, ck := range c.httpClient.GetCookies(domainURL) {
-		if ck.Name == "anon_id" {
+		switch ck.Name {
+		case "anon_id":
 			c.anonID = ck.Value
-			break
+		case "datadome":
+			// Capture fresh datadome cookie from warmup
+			if c.session.DatadomeCookie == "" {
+				c.session.DatadomeCookie = ck.Value
+				log.Printf("[vinted] captured datadome cookie from warmup")
+			}
 		}
 	}
 
@@ -1464,7 +1480,691 @@ func (c *Client) doSendOffer(itemID, sellerID int64, price string, currency stri
 	return fmt.Errorf("send offer failed (HTTP %d): %s", resp2.StatusCode, truncate(bodyStr2, 300))
 }
 
+// GetMyItems fetches the user's listed items using the TLS client
+func (c *Client) GetMyItems(vintedUserID int64, page string) ([]byte, int, error) {
+	data, status, err := c.doGetMyItems(vintedUserID, page)
+	if err != nil && status == 401 && c.session.RefreshToken != "" {
+		log.Printf("[vinted] my-items got 401, attempting token refresh...")
+		if refreshErr := c.RefreshAccessToken(); refreshErr != nil {
+			return nil, status, err
+		}
+		return c.doGetMyItems(vintedUserID, page)
+	}
+	return data, status, err
+}
+
+func (c *Client) doGetMyItems(vintedUserID int64, page string) ([]byte, int, error) {
+	if err := c.WarmUp(); err != nil {
+		log.Printf("[vinted] warmup failed before my-items: %v", err)
+	}
+
+	// Try /users/{id}/items first
+	u := fmt.Sprintf("https://%s/api/v2/users/%d/items?page=%s&per_page=96&order=newest_first", c.session.Domain, vintedUserID, page)
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, 500, fmt.Errorf("create request: %w", err)
+	}
+	req.Header = c.apiHeaders()
+	req.Header.Set("Referer", fmt.Sprintf("https://%s/member/%d-items", c.session.Domain, vintedUserID))
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, 502, fmt.Errorf("request failed: %w", err)
+	}
+	body, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+
+	log.Printf("[vinted] GET /api/v2/users/%d/items -> %d", vintedUserID, resp.StatusCode)
+
+	// Fallback: if 404, use the wardrobe endpoint
+	if resp.StatusCode == 404 {
+		log.Printf("[vinted] /users/%d/items returned 404, trying wardrobe endpoint...", vintedUserID)
+
+		u2 := fmt.Sprintf("https://%s/api/v2/wardrobe/%d/items?page=%s&per_page=96&order=newest_first", c.session.Domain, vintedUserID, page)
+		req2, err := http.NewRequest("GET", u2, nil)
+		if err != nil {
+			return nil, 500, fmt.Errorf("create wardrobe request: %w", err)
+		}
+		req2.Header = c.apiHeaders()
+		req2.Header.Set("Referer", fmt.Sprintf("https://%s/member/%d-items", c.session.Domain, vintedUserID))
+
+		resp2, err := c.httpClient.Do(req2)
+		if err != nil {
+			return nil, 502, fmt.Errorf("wardrobe request failed: %w", err)
+		}
+		defer resp2.Body.Close()
+		body2, _ := io.ReadAll(resp2.Body)
+		log.Printf("[vinted] GET /api/v2/wardrobe/%d/items -> %d (%.200s)", vintedUserID, resp2.StatusCode, string(body2))
+
+		if resp2.StatusCode == 200 {
+			return body2, 200, nil
+		}
+
+		// Final fallback: catalog search filtered by user
+		log.Printf("[vinted] wardrobe also failed, trying catalog search...")
+		u3 := fmt.Sprintf("https://%s/api/v2/catalog/items?page=%s&per_page=96&order=newest_first&user_id=%d", c.session.Domain, page, vintedUserID)
+		req3, err := http.NewRequest("GET", u3, nil)
+		if err != nil {
+			return nil, 500, fmt.Errorf("create catalog request: %w", err)
+		}
+		req3.Header = c.apiHeaders()
+		req3.Header.Set("Referer", fmt.Sprintf("https://%s/member/%d-items", c.session.Domain, vintedUserID))
+
+		resp3, err := c.httpClient.Do(req3)
+		if err != nil {
+			return nil, 502, fmt.Errorf("catalog request failed: %w", err)
+		}
+		defer resp3.Body.Close()
+		body3, _ := io.ReadAll(resp3.Body)
+		log.Printf("[vinted] GET catalog/items?user_id=%d -> %d", vintedUserID, resp3.StatusCode)
+
+		return body3, resp3.StatusCode, nil
+	}
+
+	return body, resp.StatusCode, nil
+}
+
+// GetMySoldOrders fetches the user's sold orders using the TLS client
+func (c *Client) GetMySoldOrders(page string) ([]byte, int, error) {
+	data, status, err := c.doGetMySoldOrders(page)
+	if err != nil && status == 401 && c.session.RefreshToken != "" {
+		log.Printf("[vinted] sold-orders got 401, attempting token refresh...")
+		if refreshErr := c.RefreshAccessToken(); refreshErr != nil {
+			return nil, status, err
+		}
+		return c.doGetMySoldOrders(page)
+	}
+	return data, status, err
+}
+
+func (c *Client) doGetMySoldOrders(page string) ([]byte, int, error) {
+	if err := c.WarmUp(); err != nil {
+		log.Printf("[vinted] warmup failed before sold-orders: %v", err)
+	}
+
+	u := fmt.Sprintf("https://%s/api/v2/my_orders?type=sold&page=%s&per_page=50", c.session.Domain, page)
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, 500, fmt.Errorf("create request: %w", err)
+	}
+	req.Header = c.apiHeaders()
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, 502, fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	log.Printf("[vinted] GET /api/v2/my_orders -> %d", resp.StatusCode)
+
+	return body, resp.StatusCode, nil
+}
+
+// RelistItem bumps an item by fetching its data from wardrobe, deleting it, and recreating it
+func (c *Client) RelistItem(itemID int64) (int64, error) {
+	if err := c.WarmUp(); err != nil {
+		log.Printf("[vinted] warmup failed before relist: %v", err)
+	}
+
+	// 1. Get item data from wardrobe (the only endpoint that works for own items)
+	var itemData map[string]interface{}
+
+	wardrobeURL := fmt.Sprintf("https://%s/api/v2/wardrobe/%d/items?per_page=200&order=newest_first", c.session.Domain, c.session.VintedUserID)
+	wReq, err := http.NewRequest("GET", wardrobeURL, nil)
+	if err != nil {
+		return 0, fmt.Errorf("create wardrobe request: %w", err)
+	}
+	wReq.Header = c.apiHeaders()
+
+	wResp, err := c.httpClient.Do(wReq)
+	if err != nil {
+		return 0, fmt.Errorf("wardrobe request failed: %w", err)
+	}
+	wBody, _ := io.ReadAll(wResp.Body)
+	wResp.Body.Close()
+	log.Printf("[vinted] GET wardrobe/%d/items -> %d", c.session.VintedUserID, wResp.StatusCode)
+
+	if wResp.StatusCode == 200 {
+		var wardrobeData map[string]interface{}
+		if err := json.Unmarshal(wBody, &wardrobeData); err == nil {
+			if items, ok := wardrobeData["items"].([]interface{}); ok {
+				for _, item := range items {
+					if im, ok := item.(map[string]interface{}); ok {
+						if id, ok := im["id"].(float64); ok && int64(id) == itemID {
+							itemData = im
+							break
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if itemData == nil {
+		return 0, fmt.Errorf("could not find item %d in wardrobe", itemID)
+	}
+
+	// Extract photo IDs
+	var photoIDs []int64
+	if photos, ok := itemData["photos"].([]interface{}); ok {
+		for _, p := range photos {
+			if pm, ok := p.(map[string]interface{}); ok {
+				if id, ok := pm["id"].(float64); ok {
+					photoIDs = append(photoIDs, int64(id))
+				}
+			}
+		}
+	}
+
+	// 2. Delete original item
+	if err := c.DeleteItem(itemID); err != nil {
+		return 0, fmt.Errorf("delete failed: %w", err)
+	}
+
+	// 3. Recreate with same data
+	createPayload := map[string]interface{}{
+		"title":           itemData["title"],
+		"description":     itemData["description"],
+		"brand_id":        itemData["brand_id"],
+		"catalog_id":      itemData["catalog_id"],
+		"color1_id":       itemData["color1_id"],
+		"color2_id":       itemData["color2_id"],
+		"size_id":         itemData["size_id"],
+		"status_id":       itemData["status_id"],
+		"package_size_id": itemData["package_size_id"],
+		"photo_ids":       photoIDs,
+	}
+
+	// Handle price — can be string or nested object
+	if priceObj, ok := itemData["price"].(map[string]interface{}); ok {
+		createPayload["price"] = priceObj["amount"]
+		createPayload["currency"] = priceObj["currency_code"]
+	} else if price, ok := itemData["price"].(string); ok {
+		createPayload["price"] = price
+	} else if price, ok := itemData["price"].(float64); ok {
+		createPayload["price"] = fmt.Sprintf("%.2f", price)
+	}
+
+	// Remove nil fields
+	for k, v := range createPayload {
+		if v == nil {
+			delete(createPayload, k)
+		}
+	}
+
+	payload, _ := json.Marshal(createPayload)
+	log.Printf("[vinted] recreating item with payload: %.500s", string(payload))
+
+	// Try /api/v2/item_upload/items first (Seller-HQ endpoint), fallback to /api/v2/items
+	createEndpoints := []string{
+		fmt.Sprintf("https://%s/api/v2/item_upload/items", c.session.Domain),
+		fmt.Sprintf("https://%s/api/v2/items", c.session.Domain),
+	}
+
+	var resp *http.Response
+	var respBody []byte
+
+	for _, createURL := range createEndpoints {
+		createReq, err := http.NewRequest("POST", createURL, strings.NewReader(string(payload)))
+		if err != nil {
+			continue
+		}
+		createReq.Header = c.apiHeadersWithBody()
+		createReq.Header.Set("Referer", fmt.Sprintf("https://%s/items/new", c.session.Domain))
+
+		r, err := c.httpClient.Do(createReq)
+		if err != nil {
+			continue
+		}
+		body, _ := io.ReadAll(r.Body)
+		r.Body.Close()
+		log.Printf("[vinted] POST %s -> %d (%.300s)", createURL, r.StatusCode, string(body))
+
+		if r.StatusCode >= 200 && r.StatusCode < 300 {
+			resp = r
+			respBody = body
+			break
+		}
+		// Keep last response for error reporting
+		resp = r
+		respBody = body
+	}
+
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		var result map[string]interface{}
+		if err := json.Unmarshal(respBody, &result); err == nil {
+			if item, ok := result["item"].(map[string]interface{}); ok {
+				if id, ok := item["id"].(float64); ok {
+					return int64(id), nil
+				}
+			}
+		}
+		return itemID, nil
+	}
+
+	return 0, fmt.Errorf("recreate failed (HTTP %d): %s", resp.StatusCode, truncate(string(respBody), 300))
+}
+
+// generateUUID produces a random UUID v4 string without external dependencies.
+func generateUUID() string {
+	b := make([]byte, 16)
+	_, _ = rand.Read(b)
+	b[6] = (b[6] & 0x0f) | 0x40 // version 4
+	b[8] = (b[8] & 0x3f) | 0x80 // variant 10
+	return fmt.Sprintf("%08x-%04x-%04x-%04x-%012x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:16])
+}
+
+// RepostItem creates a copy of the given item with photo orientation tweak.
+// If asDraft is true, the original item is kept; otherwise it is deleted first.
+// Returns the new item ID.
+func (c *Client) RepostItem(itemID int64, orientation int, asDraft bool) (int64, error) {
+	if err := c.WarmUp(); err != nil {
+		log.Printf("[vinted] warmup failed before repost: %v", err)
+	}
+
+	// 1. Get item data from wardrobe
+	var itemData map[string]interface{}
+
+	wardrobeURL := fmt.Sprintf("https://%s/api/v2/wardrobe/%d/items?per_page=200&order=newest_first", c.session.Domain, c.session.VintedUserID)
+	wReq, err := http.NewRequest("GET", wardrobeURL, nil)
+	if err != nil {
+		return 0, fmt.Errorf("create wardrobe request: %w", err)
+	}
+	wReq.Header = c.apiHeaders()
+
+	wResp, err := c.httpClient.Do(wReq)
+	if err != nil {
+		return 0, fmt.Errorf("wardrobe request failed: %w", err)
+	}
+	wBody, _ := io.ReadAll(wResp.Body)
+	wResp.Body.Close()
+	log.Printf("[vinted] GET wardrobe/%d/items -> %d", c.session.VintedUserID, wResp.StatusCode)
+
+	if wResp.StatusCode == 200 {
+		var wardrobeData map[string]interface{}
+		if err := json.Unmarshal(wBody, &wardrobeData); err == nil {
+			if items, ok := wardrobeData["items"].([]interface{}); ok {
+				for _, item := range items {
+					if im, ok := item.(map[string]interface{}); ok {
+						if id, ok := im["id"].(float64); ok && int64(id) == itemID {
+							itemData = im
+							break
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if itemData == nil {
+		return 0, fmt.Errorf("could not find item %d in wardrobe", itemID)
+	}
+
+	// Extract photo IDs and build assigned_photos with orientation
+	var assignedPhotos []map[string]interface{}
+	if photos, ok := itemData["photos"].([]interface{}); ok {
+		for _, p := range photos {
+			if pm, ok := p.(map[string]interface{}); ok {
+				if id, ok := pm["id"].(float64); ok {
+					assignedPhotos = append(assignedPhotos, map[string]interface{}{
+						"id":          int64(id),
+						"orientation": orientation,
+					})
+				}
+			}
+		}
+	}
+
+	// Extract color_ids from color1_id / color2_id
+	var colorIDs []interface{}
+	if c1 := itemData["color1_id"]; c1 != nil {
+		colorIDs = append(colorIDs, c1)
+	}
+	if c2 := itemData["color2_id"]; c2 != nil {
+		colorIDs = append(colorIDs, c2)
+	}
+
+	// Handle price — can be string or nested object
+	var priceVal interface{}
+	var currency string = "EUR"
+	if priceObj, ok := itemData["price"].(map[string]interface{}); ok {
+		priceVal = priceObj["amount"]
+		if cc, ok := priceObj["currency_code"].(string); ok {
+			currency = cc
+		}
+	} else if price, ok := itemData["price"].(string); ok {
+		priceVal = price
+	} else if price, ok := itemData["price"].(float64); ok {
+		priceVal = fmt.Sprintf("%.2f", price)
+	}
+
+	// 2. If not draft, delete original first
+	if !asDraft {
+		if err := c.DeleteItem(itemID); err != nil {
+			return 0, fmt.Errorf("delete original failed: %w", err)
+		}
+	}
+
+	// 3. Create new item with the exact payload structure
+	createPayload := map[string]interface{}{
+		"item": map[string]interface{}{
+			"id":               nil,
+			"currency":         currency,
+			"temp_uuid":        generateUUID(),
+			"title":            itemData["title"],
+			"description":      itemData["description"],
+			"brand_id":         itemData["brand_id"],
+			"size_id":          itemData["size_id"],
+			"catalog_id":       itemData["catalog_id"],
+			"status_id":        itemData["status_id"],
+			"color_ids":        colorIDs,
+			"price":            priceVal,
+			"package_size_id":  itemData["package_size_id"],
+			"is_for_sell":      true,
+			"is_for_swap":      false,
+			"assigned_photos":  assignedPhotos,
+			"shipment_prices": map[string]interface{}{
+				"domestic":      nil,
+				"international": nil,
+			},
+		},
+		"feedback_id":       nil,
+		"push_up":           false,
+		"upload_session_id": generateUUID(),
+	}
+
+	payload, _ := json.Marshal(createPayload)
+	log.Printf("[vinted] repost item %d payload: %.500s", itemID, string(payload))
+
+	createURL := fmt.Sprintf("https://%s/api/v2/items", c.session.Domain)
+	createReq, err := http.NewRequest("POST", createURL, strings.NewReader(string(payload)))
+	if err != nil {
+		return 0, fmt.Errorf("create repost request: %w", err)
+	}
+	createReq.Header = c.apiHeadersWithBody()
+	createReq.Header.Set("Referer", fmt.Sprintf("https://%s/items/new", c.session.Domain))
+
+	resp, err := c.httpClient.Do(createReq)
+	if err != nil {
+		return 0, fmt.Errorf("repost request failed: %w", err)
+	}
+	respBody, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	log.Printf("[vinted] POST /api/v2/items (repost) -> %d (%.300s)", resp.StatusCode, string(respBody))
+
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		var result map[string]interface{}
+		if err := json.Unmarshal(respBody, &result); err == nil {
+			if item, ok := result["item"].(map[string]interface{}); ok {
+				if id, ok := item["id"].(float64); ok {
+					return int64(id), nil
+				}
+			}
+		}
+		return 0, nil
+	}
+
+	return 0, fmt.Errorf("repost failed (HTTP %d): %s", resp.StatusCode, truncate(string(respBody), 300))
+}
+
+// DeleteItem removes an item by ID via DELETE /api/v2/items/{id}
+func (c *Client) DeleteItem(itemID int64) error {
+	err := c.doDeleteItem(itemID)
+	if err != nil && strings.Contains(err.Error(), "HTTP 401") && c.session.RefreshToken != "" {
+		if refreshErr := c.RefreshAccessToken(); refreshErr != nil {
+			return err
+		}
+		return c.doDeleteItem(itemID)
+	}
+	return err
+}
+
+func (c *Client) doDeleteItem(itemID int64) error {
+	if err := c.WarmUp(); err != nil {
+		log.Printf("[vinted] warmup failed before delete: %v", err)
+	}
+
+	u := fmt.Sprintf("https://%s/api/v2/items/%d/delete", c.session.Domain, itemID)
+	req, err := http.NewRequest("POST", u, nil)
+	if err != nil {
+		return fmt.Errorf("create delete request: %w", err)
+	}
+	req.Header = c.apiHeaders()
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("delete request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	log.Printf("[vinted] POST /api/v2/items/%d/delete -> %d", itemID, resp.StatusCode)
+
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		return nil
+	}
+	if resp.StatusCode == 401 {
+		return fmt.Errorf("HTTP 401: unauthorized")
+	}
+	return fmt.Errorf("delete failed (HTTP %d): %s", resp.StatusCode, truncate(string(body), 200))
+}
+
+// RecreateItem posts a new item with the same data from a GetItem response.
+// It fetches the raw item data first to get all fields, then creates a new listing.
+func (c *Client) RecreateItem(detail *VintedItemDetailResponse) (int64, error) {
+	if err := c.WarmUp(); err != nil {
+		log.Printf("[vinted] warmup failed before recreate: %v", err)
+	}
+
+	// Fetch full raw item data to get all fields (title, description, brand, category, etc.)
+	rawURL := fmt.Sprintf("https://%s/api/v2/items/%d?localization=%s", c.session.Domain, detail.Item.ID, c.locale())
+	rawReq, err := http.NewRequest("GET", rawURL, nil)
+	if err != nil {
+		return 0, fmt.Errorf("create raw request: %w", err)
+	}
+	rawReq.Header = c.apiHeaders()
+
+	rawResp, err := c.httpClient.Do(rawReq)
+	if err != nil {
+		return 0, fmt.Errorf("raw fetch failed: %w", err)
+	}
+	defer rawResp.Body.Close()
+
+	rawBody, _ := io.ReadAll(rawResp.Body)
+
+	var rawData map[string]interface{}
+	if err := json.Unmarshal(rawBody, &rawData); err != nil {
+		return 0, fmt.Errorf("parse raw item: %w", err)
+	}
+
+	itemData, ok := rawData["item"].(map[string]interface{})
+	if !ok {
+		return 0, fmt.Errorf("no item field in response")
+	}
+
+	// Extract photo IDs for reuse
+	var photoIDs []int64
+	if photos, ok := itemData["photos"].([]interface{}); ok {
+		for _, p := range photos {
+			if pm, ok := p.(map[string]interface{}); ok {
+				if id, ok := pm["id"].(float64); ok {
+					photoIDs = append(photoIDs, int64(id))
+				}
+			}
+		}
+	}
+
+	// Build the create payload with essential fields
+	createPayload := map[string]interface{}{
+		"title":       itemData["title"],
+		"description": itemData["description"],
+		"price":       itemData["price"],
+		"currency":    itemData["currency"],
+		"brand_id":    itemData["brand_id"],
+		"catalog_id":  itemData["catalog_id"],
+		"color1_id":   itemData["color1_id"],
+		"color2_id":   itemData["color2_id"],
+		"size_id":     itemData["size_id"],
+		"status_id":   itemData["status_id"],
+		"package_size_id": itemData["package_size_id"],
+		"measurement_width": itemData["measurement_width"],
+		"measurement_length": itemData["measurement_length"],
+		"photo_ids":   photoIDs,
+	}
+
+	// Remove nil fields
+	for k, v := range createPayload {
+		if v == nil {
+			delete(createPayload, k)
+		}
+	}
+
+	payload, _ := json.Marshal(createPayload)
+	createURL := fmt.Sprintf("https://%s/api/v2/items", c.session.Domain)
+	createReq, err := http.NewRequest("POST", createURL, strings.NewReader(string(payload)))
+	if err != nil {
+		return 0, fmt.Errorf("create recreate request: %w", err)
+	}
+	createReq.Header = c.apiHeadersWithBody()
+
+	resp, err := c.httpClient.Do(createReq)
+	if err != nil {
+		return 0, fmt.Errorf("recreate request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := io.ReadAll(resp.Body)
+	log.Printf("[vinted] POST /api/v2/items -> %d (%.300s)", resp.StatusCode, string(respBody))
+
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		var result map[string]interface{}
+		if err := json.Unmarshal(respBody, &result); err == nil {
+			if item, ok := result["item"].(map[string]interface{}); ok {
+				if id, ok := item["id"].(float64); ok {
+					return int64(id), nil
+				}
+			}
+		}
+		return 0, nil
+	}
+
+	return 0, fmt.Errorf("recreate failed (HTTP %d): %s", resp.StatusCode, truncate(string(respBody), 300))
+}
+
+// UpdateItemPrice modifies an item's price via PATCH /api/v2/items/{id}
+func (c *Client) UpdateItemPrice(itemID int64, price string, currency string) error {
+	err := c.doUpdateItemPrice(itemID, price, currency)
+	if err != nil && strings.Contains(err.Error(), "HTTP 401") && c.session.RefreshToken != "" {
+		if refreshErr := c.RefreshAccessToken(); refreshErr != nil {
+			return err
+		}
+		return c.doUpdateItemPrice(itemID, price, currency)
+	}
+	return err
+}
+
+func (c *Client) doUpdateItemPrice(itemID int64, price string, currency string) error {
+	if err := c.WarmUp(); err != nil {
+		log.Printf("[vinted] warmup failed before price update: %v", err)
+	}
+
+	payload := map[string]interface{}{
+		"item": map[string]interface{}{
+			"price": price,
+		},
+	}
+	body, _ := json.Marshal(payload)
+
+	u := fmt.Sprintf("https://%s/api/v2/items/%d", c.session.Domain, itemID)
+	req, err := http.NewRequest("PATCH", u, strings.NewReader(string(body)))
+	if err != nil {
+		return fmt.Errorf("create update request: %w", err)
+	}
+	req.Header = c.apiHeadersWithBody()
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("update request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := io.ReadAll(resp.Body)
+	log.Printf("[vinted] PATCH /api/v2/items/%d -> %d", itemID, resp.StatusCode)
+
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		return nil
+	}
+	if resp.StatusCode == 401 {
+		return fmt.Errorf("HTTP 401: unauthorized")
+	}
+	return fmt.Errorf("update price failed (HTTP %d): %s", resp.StatusCode, truncate(string(respBody), 300))
+}
+
 // GetAPIHeaders exposes the internal apiHeaders for use outside this package
 func (c *Client) GetAPIHeaders() http.Header {
 	return c.apiHeaders()
+}
+
+// GetUserProfile fetches the full public profile of any Vinted user by ID.
+func (c *Client) GetUserProfile(userID int64) (map[string]interface{}, error) {
+	if err := c.WarmUp(); err != nil {
+		log.Printf("[vinted] warmup failed before user profile: %v", err)
+	}
+
+	u := fmt.Sprintf("https://%s/api/v2/users/%d", c.session.Domain, userID)
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, fmt.Errorf("create request: %w", err)
+	}
+	req.Header = c.apiHeaders()
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+
+	log.Printf("[vinted] GET /api/v2/users/%d -> %d", userID, resp.StatusCode)
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, truncate(string(body), 300))
+	}
+
+	var raw map[string]interface{}
+	if err := json.Unmarshal(body, &raw); err != nil {
+		return nil, fmt.Errorf("json decode: %w", err)
+	}
+
+	// Vinted wraps in {"user": {...}}
+	if userMap, ok := raw["user"].(map[string]interface{}); ok {
+		return userMap, nil
+	}
+
+	return raw, nil
+}
+
+// GetUserFeedback fetches a user's feedback/reviews
+func (c *Client) GetUserFeedback(userID int64) ([]byte, int, error) {
+	if err := c.WarmUp(); err != nil {
+		log.Printf("[vinted] warmup failed before user feedback: %v", err)
+	}
+
+	u := fmt.Sprintf("https://%s/api/v2/users/%d/feedback?page=1&per_page=20", c.session.Domain, userID)
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, 500, fmt.Errorf("create request: %w", err)
+	}
+	req.Header = c.apiHeaders()
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, 502, fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+
+	log.Printf("[vinted] GET /api/v2/users/%d/feedback -> %d", userID, resp.StatusCode)
+	return body, resp.StatusCode, nil
 }

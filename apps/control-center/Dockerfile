@@ -12,6 +12,9 @@ RUN npm ci
 # --- Builder ---
 FROM base AS builder
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+    && rm -rf /var/lib/apt/lists/*
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NODE_OPTIONS="--max-old-space-size=1536"

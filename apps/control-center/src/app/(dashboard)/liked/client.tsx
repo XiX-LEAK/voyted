@@ -46,9 +46,9 @@ export function LikedClient() {
         throw new Error(`Failed to fetch favorites: ${res.status}`);
       }
       const data = await res.json();
-      
+
       const vItems = (data.items || []) as VintedFavItem[];
-      
+
       if (vItems.length > 0) {
         syncLikes(vItems.map(i => Number(i.id)));
       }
@@ -59,8 +59,8 @@ export function LikedClient() {
         title: item.title,
         brand: item.brand_title,
         price: `${item.price.amount} ${item.price.currency_code}`,
-        total_price: item.total_item_price 
-          ? `${item.total_item_price.amount} ${item.total_item_price.currency_code}` 
+        total_price: item.total_item_price
+          ? `${item.total_item_price.amount} ${item.total_item_price.currency_code}`
           : null,
         size: item.size_title,
         condition: item.status,
@@ -111,14 +111,14 @@ export function LikedClient() {
   if (!linked) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
-        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 text-blue-500">
-          <Heart className="h-8 w-8" />
+        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-accent/60">
+          <Heart className="h-8 w-8 text-foreground/24" />
         </div>
-        <h2 className="text-2xl font-bold tracking-tight">Vinted Account Not Linked</h2>
-        <p className="mt-1.5 text-muted-foreground max-w-sm">
+        <h2 className="text-base font-semibold text-foreground">Vinted Account Not Linked</h2>
+        <p className="mt-1.5 text-foreground/48 max-w-sm">
           Connect your Vinted account in the settings to view and manage your liked items directly from Vintrack.
         </p>
-        <Button asChild className="mt-6">
+        <Button asChild size="sm" className="mt-6">
           <Link href="/account">Go to Account Settings</Link>
         </Button>
       </div>
@@ -129,18 +129,18 @@ export function LikedClient() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Liked Items</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-lg font-semibold tracking-tight text-foreground">Liked Items</h1>
+          <p className="text-sm text-foreground/48 mt-0.5">
             {pagination ? `${pagination.total_pages} items found` : "Manage your Vinted favorites."}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => fetchFavorites(page)}
             disabled={loading}
-            className="h-9 gap-1.5"
+            className="h-9 gap-1.5 text-foreground/48 hover:text-foreground/72"
           >
             <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
             Refresh
@@ -161,22 +161,22 @@ export function LikedClient() {
           ))}
         </div>
       ) : (
-        <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/20 text-center">
-          <Heart className="mb-2 h-8 w-8 text-muted-foreground/30" />
-          <p className="font-medium text-muted-foreground">
+        <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-dashed border-border/50 bg-accent/20 text-center">
+          <Heart className="mb-2 h-8 w-8 text-foreground/24" />
+          <p className="font-medium text-foreground/48">
             {page > 1 ? "No more items on this page" : "No liked items found"}
           </p>
-          <p className="text-xs text-muted-foreground/60">
-            {page > 1 
-              ? "Try going back to the previous page." 
+          <p className="text-xs text-foreground/36">
+            {page > 1
+              ? "Try going back to the previous page."
               : "Your Vinted favorites will appear here."}
           </p>
           {page > 1 && (
-            <Button 
-              variant="link" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setPage(1)}
-              className="mt-2 text-blue-500"
+              className="mt-2 text-foreground/48 hover:text-foreground/72"
             >
               Back to first page
             </Button>
@@ -191,10 +191,11 @@ export function LikedClient() {
             size="icon"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1 || loading}
+            className="border-border/50"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm font-medium">
+          <span className="text-sm font-medium text-foreground/48">
             Page {page} of {pagination.total_pages}
           </span>
           <Button
@@ -202,6 +203,7 @@ export function LikedClient() {
             size="icon"
             onClick={() => setPage((p) => Math.min(pagination.total_pages, p + 1))}
             disabled={page === pagination.total_pages || loading}
+            className="border-border/50"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

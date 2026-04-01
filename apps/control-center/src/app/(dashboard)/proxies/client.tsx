@@ -98,8 +98,8 @@ export function ProxiesClient({
     <div className="space-y-6 mx-auto max-w-4xl">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Proxy Groups</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-lg font-semibold tracking-tight text-foreground">Proxy Groups</h1>
+          <p className="text-sm text-foreground/48 mt-0.5">
             Manage your proxy lists for monitors.
           </p>
         </div>
@@ -113,14 +113,14 @@ export function ProxiesClient({
       </div>
 
       {userRole === "premium" && (
-        <Card className="border-amber-200 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-500/10">
+        <Card className="border-border/50 bg-card">
           <CardContent className="p-4 flex items-center gap-3">
-            <Shield className="w-5 h-5 text-amber-600 shrink-0" />
+            <Shield className="w-5 h-5 text-foreground/32 shrink-0" />
             <div>
-              <p className="text-[13px] font-medium text-amber-900 dark:text-amber-200">
+              <p className="text-[13px] font-medium text-foreground/90">
                 Premium Account
               </p>
-              <p className="text-[12px] text-amber-700 dark:text-amber-300">
+              <p className="text-[12px] text-foreground/48">
                 You can use server proxies when creating monitors, or use your
                 own proxy groups.
               </p>
@@ -130,13 +130,13 @@ export function ProxiesClient({
       )}
 
       {groups.length === 0 ? (
-        <Card className="border-dashed">
+        <Card className="border-dashed border-border/50">
           <CardContent className="p-12 text-center">
-            <Globe className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-            <p className="text-[15px] font-medium text-muted-foreground">
+            <Globe className="w-10 h-10 text-foreground/24 mx-auto mb-3" />
+            <p className="text-base font-semibold text-foreground">
               No proxy groups yet
             </p>
-            <p className="text-[13px] text-muted-foreground mt-1">
+            <p className="text-sm text-foreground/48 mt-1">
               Create a proxy group to start monitoring. Each monitor needs a
               proxy group to scrape Vinted.
             </p>
@@ -153,26 +153,26 @@ export function ProxiesClient({
       ) : (
         <div className="space-y-3">
           {groups.map((group) => (
-            <Card key={group.id} className="border-input/60">
+            <Card key={group.id} className="border-border/50">
               <CardContent className="p-0">
                 <div
-                  className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                  className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-accent/40 transition-colors"
                   onClick={() =>
                     setExpandedId(expandedId === group.id ? null : group.id)
                   }
                 >
                   <div className="flex items-center gap-3">
-                    <Server className="w-4 h-4 text-muted-foreground" />
+                    <Server className="w-4 h-4 text-foreground/32" />
                     <div>
-                      <p className="text-[14px] font-medium text-foreground">
+                      <p className="text-[14px] font-medium text-foreground/90">
                         {group.name}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[12px] text-muted-foreground">
+                        <span className="text-[12px] text-foreground/48">
                           {getProxyCount(group.proxies)} proxies
                         </span>
-                        <span className="text-muted-foreground/40">·</span>
-                        <span className="text-[12px] text-muted-foreground">
+                        <span className="text-foreground/24">·</span>
+                        <span className="text-[12px] text-foreground/48">
                           {group.monitorCount} monitor
                           {group.monitorCount !== 1 ? "s" : ""}
                         </span>
@@ -183,7 +183,7 @@ export function ProxiesClient({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-red-500"
+                      className="h-8 w-8 text-foreground/48 hover:text-red-500"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(group.id);
@@ -192,15 +192,15 @@ export function ProxiesClient({
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
                     {expandedId === group.id ? (
-                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                      <ChevronUp className="w-4 h-4 text-foreground/32" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                      <ChevronDown className="w-4 h-4 text-foreground/32" />
                     )}
                   </div>
                 </div>
 
                 {expandedId === group.id && (
-                  <div className="border-t border-border px-5 py-4 space-y-3">
+                  <div className="border-t border-border/30 px-5 py-4 space-y-3">
                     {editingId === group.id ? (
                       <>
                         <div className="space-y-2">
@@ -219,7 +219,7 @@ export function ProxiesClient({
                             value={editProxies}
                             onChange={(e) => setEditProxies(e.target.value)}
                             rows={6}
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-[12px] font-mono text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                            className="w-full rounded-lg border border-border/50 bg-background px-3 py-2 text-[12px] font-mono text-foreground placeholder:text-foreground/36 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                             placeholder="http://user:pass@host:port"
                           />
                         </div>
@@ -232,8 +232,9 @@ export function ProxiesClient({
                           </Button>
                           <Button
                             size="sm"
-                            variant="outline"
+                            variant="ghost"
                             onClick={() => setEditingId(null)}
+                            className="text-foreground/48 hover:text-foreground/72"
                           >
                             Cancel
                           </Button>
@@ -242,7 +243,7 @@ export function ProxiesClient({
                     ) : (
                       <>
                         <div className="bg-muted rounded-lg p-3">
-                          <pre className="text-[11px] font-mono text-muted-foreground whitespace-pre-wrap break-all max-h-40 overflow-y-auto">
+                          <pre className="text-[11px] font-mono text-foreground/48 whitespace-pre-wrap break-all max-h-40 overflow-y-auto">
                             {group.proxies
                               .split("\n")
                               .filter((l) => l.trim())
@@ -261,7 +262,8 @@ export function ProxiesClient({
                         </div>
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="ghost"
+                          className="text-foreground/48 hover:text-foreground/72"
                           onClick={() => {
                             setEditingId(group.id);
                             setEditName(group.name);
@@ -309,20 +311,21 @@ export function ProxiesClient({
                 id="proxies"
                 rows={8}
                 required
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-[13px] font-mono text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                className="w-full rounded-lg border border-border/50 bg-background px-3 py-2 text-[13px] font-mono text-foreground placeholder:text-foreground/36 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                 placeholder={
                   "http://user:pass@host:port\nhttp://user:pass@host:port\n\nSupported formats:\nhttp://user:pass@host:port\nsocks5://user:pass@host:port\nhost:port:user:pass"
                 }
               />
-              <p className="text-[12px] text-muted-foreground">
+              <p className="text-[12px] text-foreground/48">
                 One proxy per line. Supports HTTP, HTTPS, and SOCKS5.
               </p>
             </div>
             <DialogFooter>
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 onClick={() => setIsCreateOpen(false)}
+                className="text-foreground/48 hover:text-foreground/72"
               >
                 Cancel
               </Button>

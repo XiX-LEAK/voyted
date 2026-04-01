@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS "smart_offer_rules" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "isActive" BOOLEAN NOT NULL DEFAULT true,
+  "minAcceptPercent" INTEGER NOT NULL DEFAULT 80,
+  "counterPercent" INTEGER NOT NULL DEFAULT 90,
+  "autoAccept" BOOLEAN NOT NULL DEFAULT false,
+  "autoCounter" BOOLEAN NOT NULL DEFAULT true,
+  "declinePercent" INTEGER NOT NULL DEFAULT 50,
+  "minPrice" DOUBLE PRECISION,
+  "maxPrice" DOUBLE PRECISION,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "message_templates" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "category" TEXT NOT NULL DEFAULT 'general',
+  "message" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+);

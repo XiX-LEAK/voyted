@@ -11,15 +11,16 @@ import (
 )
 
 type VintedSession struct {
-	UserID       string `json:"user_id"`
-	VintedUserID int64  `json:"vinted_user_id"`
-	VintedName   string `json:"vinted_name"`
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token,omitempty"`
-	Domain       string `json:"domain"`
-	Status       string `json:"status"`
-	LinkedAt     string `json:"linked_at"`
-	LastCheck    string `json:"last_check"`
+	UserID        string `json:"user_id"`
+	VintedUserID  int64  `json:"vinted_user_id"`
+	VintedName    string `json:"vinted_name"`
+	AccessToken   string `json:"access_token"`
+	RefreshToken  string `json:"refresh_token,omitempty"`
+	DatadomeCookie string `json:"datadome_cookie,omitempty"`
+	Domain        string `json:"domain"`
+	Status        string `json:"status"`
+	LinkedAt      string `json:"linked_at"`
+	LastCheck     string `json:"last_check"`
 }
 
 type Manager struct {

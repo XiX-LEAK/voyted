@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS "scheduled_posts" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "itemId" INTEGER,
+  "title" TEXT,
+  "scheduledAt" TIMESTAMP(3) NOT NULL,
+  "status" TEXT NOT NULL DEFAULT 'pending',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "restock_rules" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "itemTitle" TEXT NOT NULL,
+  "stockCount" INTEGER NOT NULL DEFAULT 1,
+  "autoRepost" BOOLEAN NOT NULL DEFAULT true,
+  "isActive" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+);

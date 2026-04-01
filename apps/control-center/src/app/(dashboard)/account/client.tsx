@@ -54,7 +54,8 @@ export function AccountClient({
   const [status, setStatus] = useState<AccountStatus>(initialStatus);
   const [accessToken, setAccessToken] = useState("");
   const [refreshToken, setRefreshToken] = useState("");
-  const [selectedRegion, setSelectedRegion] = useState("de");
+  const [datadomeCookie, setDatadomeCookie] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("fr");
   const [isVintedIdVisible, setIsVintedIdVisible] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -71,7 +72,8 @@ export function AccountClient({
       const result = await linkVintedAccount(
         accessToken.trim(),
         `www.${selectedDomain}`,
-        refreshToken.trim() || undefined
+        refreshToken.trim() || undefined,
+        datadomeCookie.trim() || undefined
       );
       if (result.error) {
         toast.error(result.error);
@@ -79,6 +81,7 @@ export function AccountClient({
       }
       setAccessToken("");
       setRefreshToken("");
+      setDatadomeCookie("");
       setStatus({
         linked: true,
         status: "active",
@@ -125,32 +128,33 @@ export function AccountClient({
   return (
     <div className="space-y-6 mx-auto max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Vinted Account</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
+        <h1 className="text-lg font-semibold tracking-tight text-foreground">Vinted Account</h1>
+        <p className="text-sm text-foreground/48 mt-0.5">
           Link your Vinted account to like items and more, directly from the
           dashboard.
         </p>
       </div>
 
       {status.linked ? (
-        <Card className="border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10">
+        <Card className="border-border/50 bg-card">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
-                  <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-10 h-10 rounded-xl bg-accent/60 flex items-center justify-center">
+                  <ShieldCheck className="w-5 h-5 text-foreground/32" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">
+                  <CardTitle className="text-base font-semibold">
                     @{status.vinted_name}
                   </CardTitle>
-                  <CardDescription>Linked to {status.domain}</CardDescription>
+                  <CardDescription className="text-foreground/48">Linked to {status.domain}</CardDescription>
                 </div>
               </div>
               <Badge
                 variant={
                   status.status === "active" ? "default" : "destructive"
                 }
+                className={status.status === "active" ? "bg-emerald-500/15 text-emerald-500 border-emerald-500/20" : ""}
               >
                 {status.status}
               </Badge>
@@ -158,15 +162,15 @@ export function AccountClient({
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-              <div className="bg-muted/50 p-2 rounded-md">
-                <span className="text-muted-foreground text-xs uppercase tracking-wider font-medium">Vinted ID</span>
+              <div className="bg-accent/40 p-2 rounded-lg">
+                <span className="text-[11px] font-medium text-foreground/36 uppercase tracking-wider">Vinted ID</span>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <p className="font-medium">
+                  <p className="font-medium text-foreground/90">
                     {isVintedIdVisible ? status.vinted_id : "••••••••••"}
                   </p>
                   <button
                     onClick={() => setIsVintedIdVisible((prev) => !prev)}
-                    className="p-1 text-muted-foreground hover:text-foreground"
+                    className="p-1 text-foreground/48 hover:text-foreground/72"
                   >
                     {isVintedIdVisible ? (
                       <EyeOff className="w-4 h-4" />
@@ -176,17 +180,17 @@ export function AccountClient({
                   </button>
                 </div>
               </div>
-              <div className="bg-muted/50 p-2 rounded-md">
-                <span className="text-muted-foreground text-xs uppercase tracking-wider font-medium">Linked</span>
-                <p className="font-medium mt-0.5">
+              <div className="bg-accent/40 p-2 rounded-lg">
+                <span className="text-[11px] font-medium text-foreground/36 uppercase tracking-wider">Linked</span>
+                <p className="font-medium text-foreground/90 mt-0.5">
                   {status.linked_at
                     ? new Date(status.linked_at).toLocaleDateString()
                     : "—"}
                 </p>
               </div>
-              <div className="bg-muted/50 p-2 rounded-md">
-                <span className="text-muted-foreground text-xs uppercase tracking-wider font-medium">Last Check</span>
-                <p className="font-medium mt-0.5">
+              <div className="bg-accent/40 p-2 rounded-lg">
+                <span className="text-[11px] font-medium text-foreground/36 uppercase tracking-wider">Last Check</span>
+                <p className="font-medium text-foreground/90 mt-0.5">
                   {status.last_check
                     ? new Date(status.last_check).toLocaleString()
                     : "—"}
@@ -195,11 +199,11 @@ export function AccountClient({
             </div>
             <div className="flex flex-col xs:flex-row gap-2">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={handleRefresh}
                 disabled={isPending}
-                className="flex-1 sm:flex-none gap-1.5"
+                className="flex-1 sm:flex-none gap-1.5 text-foreground/48 hover:text-foreground/72"
               >
                 <RefreshCw
                   className={cn("w-3.5 h-3.5", isPending && "animate-spin")}
@@ -207,11 +211,11 @@ export function AccountClient({
                 Refresh
               </Button>
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={handleUnlink}
                 disabled={isPending}
-                className="flex-1 sm:flex-none gap-1.5 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/20 hover:bg-red-50 dark:hover:bg-red-500/10 dark:bg-transparent"
+                className="flex-1 sm:flex-none gap-1.5 text-red-500 hover:text-red-400 hover:bg-red-500/10"
               >
                 <Unlink className="w-3.5 h-3.5" />
                 Unlink Account
@@ -220,29 +224,33 @@ export function AccountClient({
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="border-border/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <LinkIcon className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-base font-semibold">
+              <LinkIcon className="w-5 h-5 text-foreground/32" />
               Link Vinted Account
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-foreground/48">
               Connect your Vinted account to enable likes and more directly
               from your monitor feed.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg p-3 flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-              <p className="text-sm text-amber-800 dark:text-amber-200">
+            <div className="bg-accent/40 border border-border/30 rounded-xl p-3 flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-foreground/48 mt-0.5 shrink-0" />
+              <p className="text-sm text-foreground/48">
                 To get your tokens: Open Vinted in your browser → DevTools
                 (F12) → Application → Cookies → copy the{" "}
-                <code className="bg-amber-100 dark:bg-amber-500/20 px-1 rounded text-xs">
+                <code className="bg-accent px-1 rounded text-xs text-foreground/72">
                   access_token_web
+                </code>
+                ,{" "}
+                <code className="bg-accent px-1 rounded text-xs text-foreground/72">
+                  refresh_token_web
                 </code>{" "}
                 and{" "}
-                <code className="bg-amber-100 dark:bg-amber-500/20 px-1 rounded text-xs">
-                  refresh_token_web
+                <code className="bg-accent px-1 rounded text-xs text-foreground/72">
+                  datadome
                 </code>{" "}
                 values.
               </p>
@@ -259,10 +267,10 @@ export function AccountClient({
                       type="button"
                       onClick={() => setSelectedRegion(region.code)}
                       className={cn(
-                        "flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[12px] font-medium transition-colors",
+                        "flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[12px] font-medium transition-colors",
                         isSelected
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-input bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                          ? "bg-foreground text-background border-foreground"
+                          : "border-border/50 bg-background text-foreground/48 hover:bg-accent"
                       )}
                     >
                       <span className="text-sm shrink-0">{region.flag}</span>
@@ -293,8 +301,24 @@ export function AccountClient({
                 value={refreshToken}
                 onChange={(e) => setRefreshToken(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-foreground/48">
                 Providing the refresh token allows automatic token renewal so your session stays active.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="datadome-cookie">Cookie Datadome</Label>
+              <Input
+                id="datadome-cookie"
+                type="password"
+                placeholder="Paste your datadome cookie (required for relist)..."
+                value={datadomeCookie}
+                onChange={(e) => setDatadomeCookie(e.target.value)}
+              />
+              <p className="text-xs text-foreground/48">
+                Nécessaire pour relister et modifier les articles. Copiez le cookie{" "}
+                <code className="bg-muted px-1 rounded text-xs">datadome</code>{" "}
+                depuis les DevTools.
               </p>
             </div>
 
@@ -302,6 +326,7 @@ export function AccountClient({
               onClick={handleLink}
               disabled={!accessToken.trim() || isPending}
               className="gap-2"
+              size="sm"
             >
               {isPending ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
@@ -314,92 +339,92 @@ export function AccountClient({
         </Card>
       )}
 
-      <Card>
+      <Card className="border-border/50">
         <CardHeader>
-          <CardTitle className="text-base">
+          <CardTitle className="text-base font-semibold">
             What can you do with a linked account?
           </CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="space-y-3 text-sm">
             <li className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 flex items-center justify-center shrink-0">
-                <Heart className="w-4 h-4 text-red-500" />
+              <div className="w-8 h-8 rounded-lg bg-accent/60 flex items-center justify-center shrink-0">
+                <Heart className="w-4 h-4 text-foreground/32" />
               </div>
               <div>
-                <span className="font-medium text-foreground">Like items</span>
-                <span className="text-muted-foreground ml-1">
+                <span className="font-medium text-foreground/90">Like items</span>
+                <span className="text-foreground/48 ml-1">
                   — directly from the feed
                 </span>
               </div>
-              <Badge variant="outline" className="ml-auto text-[10px]">
+              <Badge variant="outline" className="ml-auto text-[10px] border-border/50 text-foreground/48">
                 Available
               </Badge>
             </li>
             <li className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center shrink-0">
-                <MessagesSquare className="w-4 h-4 text-orange-500"/>
+              <div className="w-8 h-8 rounded-lg bg-accent/60 flex items-center justify-center shrink-0">
+                <MessagesSquare className="w-4 h-4 text-foreground/32"/>
               </div>
               <div>
-                <span className="font-medium text-foreground">
+                <span className="font-medium text-foreground/90">
                   Send Messages
                 </span>
-                <span className="text-muted-foreground ml-1">
+                <span className="text-foreground/48 ml-1">
                   — direct messages to sellers
                 </span>
               </div>
-              <Badge variant="outline" className="ml-auto text-[10px]">
+              <Badge variant="outline" className="ml-auto text-[10px] border-border/50 text-foreground/48">
                 Available
               </Badge>
             </li>
             <li className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center shrink-0">
-                <MessageSquare className="w-4 h-4 text-blue-500" />
+              <div className="w-8 h-8 rounded-lg bg-accent/60 flex items-center justify-center shrink-0">
+                <MessageSquare className="w-4 h-4 text-foreground/32" />
               </div>
               <div>
-                <span className="font-medium text-foreground">
+                <span className="font-medium text-foreground/90">
                   Send offers
                 </span>
-                <span className="text-muted-foreground ml-1">
+                <span className="text-foreground/48 ml-1">
                   — price offers to sellers
                 </span>
               </div>
-              <Badge variant="outline" className="ml-auto text-[10px]">
+              <Badge variant="outline" className="ml-auto text-[10px] border-border/50 text-foreground/48">
                 Available
               </Badge>
             </li>
             <li className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0">
-                <ShoppingCart className="w-4 h-4 text-emerald-500" />
+              <div className="w-8 h-8 rounded-lg bg-accent/60 flex items-center justify-center shrink-0">
+                <ShoppingCart className="w-4 h-4 text-foreground/32" />
               </div>
               <div>
-                <span className="font-medium text-foreground">
+                <span className="font-medium text-foreground/90">
                   One-click buy
                 </span>
-                <span className="text-muted-foreground ml-1">
+                <span className="text-foreground/48 ml-1">
                   — from monitor feed
                 </span>
               </div>
               <Badge
                 variant="secondary"
-                className="ml-auto text-[10px] bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400"
+                className="ml-auto text-[10px] bg-foreground/8 text-foreground/48"
               >
                 Coming Soon
               </Badge>
             </li>
             <li className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center shrink-0">
-                <Bot className="w-4 h-4 text-purple-500" />
+              <div className="w-8 h-8 rounded-lg bg-accent/60 flex items-center justify-center shrink-0">
+                <Bot className="w-4 h-4 text-foreground/32" />
               </div>
               <div>
-                <span className="font-medium text-foreground">Auto-buy</span>
-                <span className="text-muted-foreground ml-1">
+                <span className="font-medium text-foreground/90">Auto-buy</span>
+                <span className="text-foreground/48 ml-1">
                   — rules with price thresholds
                 </span>
               </div>
               <Badge
                 variant="secondary"
-                className="ml-auto text-[10px] bg-amber-100 dark:bg-amber-500/30 text-amber-700 dark:text-amber-400"
+                className="ml-auto text-[10px] bg-foreground/8 text-foreground/48"
               >
                 Coming Soon
               </Badge>

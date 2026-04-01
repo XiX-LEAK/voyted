@@ -2,23 +2,50 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { LayoutDashboard, PlusCircle, Radio, LogOut, Globe, Shield, User, Star, BookOpen, X, Heart, MessageCircle, Package, ShoppingBag } from "lucide-react";
+import {
+  LayoutDashboard, PlusCircle, Radio, LogOut, Globe, Shield, User,
+  BookOpen, X, Heart, MessageCircle, Package, ShoppingBag, RefreshCw,
+  MessageSquare, Truck, BarChart3, Copy, Printer, Search, CalendarDays,
+  RotateCcw, FileText, Users, Download, Zap, MessageSquareText, Settings,
+  Table2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/theme-toggle";
 
-const ACCOUNT_SEEN_KEY = "vintrack:account-tab-seen";
-
-const navItems = [
-  { href: "/stock", label: "Mon Stock", icon: Package },
-  { href: "/ventes", label: "Mes Ventes", icon: ShoppingBag },
-  { href: "/dashboard", label: "Monitors", icon: LayoutDashboard },
-  { href: "/feed", label: "Live Feed", icon: Radio },
-  { href: "/proxies", label: "Proxy Groups", icon: Globe },
-  { href: "/account", label: "Account", icon: User },
-  { href: "/liked", label: "Liked Items", icon: Heart },
-  { href: "/chats", label: "Chats", icon: MessageCircle },
-  { href: "/guide", label: "Guide", icon: BookOpen },
+const navSections = [
+  {
+    label: "Overview",
+    items: [
+      { href: "/analytics", label: "Dashboard", icon: BarChart3 },
+      { href: "/dashboard", label: "Monitors", icon: LayoutDashboard },
+      { href: "/feed", label: "Live Feed", icon: Radio },
+    ],
+  },
+  {
+    label: "Gestion",
+    items: [
+      { href: "/inventaire", label: "Inventaire", icon: Package },
+      { href: "/expeditions", label: "Expeditions", icon: Truck },
+      { href: "/chats", label: "Messagerie", icon: MessageCircle },
+      { href: "/automatisations", label: "Automatisations", icon: Zap },
+      { href: "/calendrier", label: "Calendrier", icon: CalendarDays },
+    ],
+  },
+  {
+    label: "Outils",
+    items: [
+      { href: "/liked", label: "Liked Items", icon: Heart },
+      { href: "/analyzer", label: "Analyseur", icon: Search },
+      { href: "/spreadsheet", label: "Spreadsheet", icon: Table2 },
+    ],
+  },
+  {
+    label: "Parametres",
+    items: [
+      { href: "/comptes", label: "Mes Comptes", icon: Users },
+      { href: "/proxies", label: "Proxy Groups", icon: Globe },
+      { href: "/guide", label: "Guide", icon: BookOpen },
+    ],
+  },
 ];
 
 const adminNavItems = [
@@ -33,14 +60,6 @@ interface SidebarProps {
 
 export function Sidebar({ user, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const [showAccountBadge, setShowAccountBadge] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    return !localStorage.getItem(ACCOUNT_SEEN_KEY);
-  });
-
   const initials = user?.name
     ? user.name
         .split(" ")
@@ -52,157 +71,128 @@ export function Sidebar({ user, isOpen, onClose }: SidebarProps) {
 
   return (
     <aside className={cn(
-      "fixed left-0 top-0 bottom-0 z-50 flex h-full w-60 flex-col border-r border-sidebar-border/80 bg-sidebar/95 text-sidebar-foreground backdrop-blur-xl transition-transform duration-300 lg:translate-x-0",
+      "fixed left-0 top-0 bottom-0 z-50 flex h-full w-[220px] flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform duration-200 lg:translate-x-0",
       isOpen ? "translate-x-0" : "-translate-x-full"
     )}>
-
-      <div className="flex h-14 items-center justify-between border-b border-sidebar-border/80 px-5">
+      {/* Logo */}
+      <div className="flex h-12 items-center justify-between px-4">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
-            <span className="text-xs font-bold">V</span>
+          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-violet text-violet-foreground">
+            <span className="text-[10px] font-bold">V</span>
           </div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-[15px] font-semibold tracking-tight">
-              Vintrack
-            </span>
-          </div>
+          <span className="text-[14px] font-semibold tracking-tight text-sidebar-foreground">
+            Voyted
+          </span>
         </Link>
-        <button 
+        <button
           onClick={onClose}
-          className="p-1 text-sidebar-foreground/55 transition-colors hover:text-sidebar-foreground lg:hidden"
+          className="p-1 text-sidebar-foreground/40 transition-colors hover:text-sidebar-foreground lg:hidden"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
       </div>
 
-      <nav className="flex-1 px-3 pt-4 space-y-0.5">
-        <p className="mb-2 px-3 text-[11px] font-medium uppercase tracking-widest text-sidebar-foreground/40">
-          Navigation
-        </p>
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-2 pb-2 scrollbar-none">
+        {navSections.map((section) => (
+          <div key={section.label} className="mt-4 first:mt-1">
+            <p className="mb-1 px-2.5 text-[11px] font-medium text-sidebar-foreground/36 uppercase tracking-wider">
+              {section.label}
+            </p>
+            <div className="space-y-px">
+              {section.items.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onClose}
+                    className={cn(
+                      "flex items-center gap-2.5 rounded-md px-2.5 py-[5px] text-[13px] font-medium transition-colors",
+                      isActive
+                        ? "bg-violet/10 text-sidebar-foreground"
+                        : "text-sidebar-foreground/56 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground/90"
+                    )}
+                  >
+                    <item.icon className={cn(
+                      "w-[15px] h-[15px] shrink-0",
+                      isActive ? "text-violet" : "text-sidebar-foreground/36"
+                    )} />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
 
-        {navItems.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/");
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => {
-                if (item.href === "/account" && showAccountBadge) {
-                  localStorage.setItem(ACCOUNT_SEEN_KEY, "1");
-                  setShowAccountBadge(false);
-                }
-                onClose?.();
-              }}
-              className={cn(
-                "flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors",
-                isActive
-                  ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-                  : "text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              )}
-            >
-              <item.icon
-                className={cn(
-                  "w-4 h-4",
-                  isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground/45"
-                )}
-              />
-              {item.label}
-              {item.href === "/account" && showAccountBadge && (
-                <span className="ml-auto text-[9px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded-full uppercase tracking-wide">
-                  New
-                </span>
-              )}
-            </Link>
-          );
-        })}
-
-        <div className="pt-4">
+        {/* New Monitor */}
+        <div className="mt-4 px-0.5">
           <Link
             href="/monitors/new"
             onClick={onClose}
-            className="flex items-center gap-2.5 rounded-lg border border-dashed border-sidebar-border/80 px-3 py-2 text-[13px] font-medium text-sidebar-foreground/68 transition-colors hover:border-sidebar-foreground/20 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            className="flex items-center gap-2.5 rounded-md border border-dashed border-violet/20 px-2.5 py-[5px] text-[13px] font-medium text-sidebar-foreground/40 transition-colors hover:border-violet/40 hover:text-sidebar-foreground/60"
           >
-            <PlusCircle className="w-4 h-4 text-sidebar-foreground/45" />
+            <PlusCircle className="w-[15px] h-[15px]" />
             New Monitor
           </Link>
         </div>
 
-        <div className="pt-4">
-          <p className="mb-2 px-3 text-[11px] font-medium uppercase tracking-widest text-sidebar-foreground/40">
-            Community
-          </p>
-          <a
-            href="https://github.com/JakobAIOdev/Vintrack-Vinted-Monitor"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-amber-500 transition-colors hover:bg-amber-500/12 hover:text-amber-400"
-          >
-            <Star className="w-4 h-4" />
-            Star on GitHub
-          </a>
-        </div>
-
         {user?.role === "admin" && (
-          <div className="pt-4">
-            <p className="mb-2 px-3 text-[11px] font-medium uppercase tracking-widest text-sidebar-foreground/40">
+          <div className="mt-4">
+            <p className="mb-1 px-2.5 text-[11px] font-medium text-sidebar-foreground/36 uppercase tracking-wider">
               Admin
             </p>
-            {adminNavItems.map((item) => {
-              const isActive =
-                pathname === item.href || pathname.startsWith(item.href + "/");
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onClose}
-                  className={cn(
-                    "flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors",
-                    isActive
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-                      : "text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                  )}
-                >
-                  <item.icon
+            <div className="space-y-px">
+              {adminNavItems.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onClose}
                     className={cn(
-                      "w-4 h-4",
-                      isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground/45"
+                      "flex items-center gap-2.5 rounded-md px-2.5 py-[5px] text-[13px] font-medium transition-colors",
+                      isActive
+                        ? "bg-violet/10 text-sidebar-foreground"
+                        : "text-sidebar-foreground/56 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground/90"
                     )}
-                  />
-                  {item.label}
-                </Link>
-              );
-            })}
+                  >
+                    <item.icon className={cn(
+                      "w-[15px] h-[15px] shrink-0",
+                      isActive ? "text-violet" : "text-sidebar-foreground/36"
+                    )} />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
       </nav>
 
-      <div className="border-t border-sidebar-border/80 p-3">
-        <ThemeToggle className="mb-3" />
-        <div className="flex items-center gap-2.5 px-2 py-1.5">
+      {/* User section */}
+      <div className="border-t border-sidebar-border px-2 py-2.5">
+        <div className="flex items-center gap-2.5 rounded-md px-2 py-1.5 transition-colors hover:bg-sidebar-accent/60">
           {user?.image ? (
-            <img
-              src={user.image}
-              alt=""
-              className="w-7 h-7 rounded-full"
-            />
+            <img src={user.image} alt="" className="w-6 h-6 rounded-full" />
           ) : (
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-sidebar-accent text-[10px] font-bold text-sidebar-accent-foreground">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-sidebar-accent text-[9px] font-bold text-sidebar-foreground/72">
               {initials}
             </div>
           )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="truncate text-[13px] font-medium text-sidebar-foreground">
+              <p className="truncate text-[13px] font-medium text-sidebar-foreground/90">
                 {user?.name || "User"}
               </p>
               {user?.role === "premium" && (
-                <span className="rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-400">
+                <span className="rounded-full bg-violet/15 px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide text-violet">
                   Pro
                 </span>
               )}
               {user?.role === "admin" && (
-                <span className="rounded-full bg-red-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-red-400">
+                <span className="rounded-full bg-violet/15 px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide text-violet">
                   Admin
                 </span>
               )}
@@ -210,16 +200,11 @@ export function Sidebar({ user, isOpen, onClose }: SidebarProps) {
           </div>
           <Link
             href="/logout"
-            className="p-1 text-sidebar-foreground/45 transition-colors hover:text-sidebar-foreground"
+            className="p-1 text-sidebar-foreground/32 transition-colors hover:text-sidebar-foreground/72"
             title="Sign out"
           >
             <LogOut className="w-3.5 h-3.5" />
           </Link>
-        </div>
-        <div className="mt-2 px-2 flex justify-center">
-          <p className="text-[10px] font-medium text-sidebar-foreground/40">
-            Vintrack v{process.env.NEXT_PUBLIC_APP_VERSION}
-          </p>
         </div>
       </div>
     </aside>

@@ -45,10 +45,10 @@ export async function getAccountStatus() {
   return data;
 }
 
-export async function linkVintedAccount(accessToken: string, domain: string, refreshToken?: string) {
+export async function linkVintedAccount(accessToken: string, domain: string, refreshToken?: string, datadomeCookie?: string) {
   return apiFetch("/api/account/link", {
     method: "POST",
-    body: JSON.stringify({ access_token: accessToken, domain, refresh_token: refreshToken || "" }),
+    body: JSON.stringify({ access_token: accessToken, domain, refresh_token: refreshToken || "", datadome_cookie: datadomeCookie || "" }),
   });
 }
 
