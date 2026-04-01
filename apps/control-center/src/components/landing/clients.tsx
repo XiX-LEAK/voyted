@@ -3,30 +3,23 @@ const VINTED_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53M
 export function LandingClients() {
   return (
     <>
-      {/* Glow halo blanc */}
-      <div className="pointer-events-none relative mx-auto overflow-hidden" style={{ height: "400px", marginBottom: "-300px" }}>
-        {/* Glow radial blanc */}
-        <div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2"
-          style={{
-            width: "600px",
-            height: "300px",
-            background: "radial-gradient(ellipse at center bottom, rgba(255,255,255,0.25) 0%, transparent 70%)",
-            filter: "blur(20px)",
-          }}
-        />
-        {/* Arc ellipse */}
-        <div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2"
-          style={{
-            width: "900px",
-            height: "400px",
-            borderRadius: "50%",
-            border: "1px solid rgba(255,255,255,0.08)",
-            background: "transparent",
-            transform: "translateX(-50%) translateY(50%)",
-          }}
-        />
+      {/* Glow halo — copie exacte Vinteer, couleur blanche */}
+      <div
+        className="pointer-events-none relative -z-[2] mx-auto h-[50rem] overflow-hidden my-[-20.8rem]"
+        style={{
+          ["--color" as string]: "rgba(255,255,255,0.8)",
+          maskImage: "radial-gradient(ellipse at center center, #000, transparent 50%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center center, #000, transparent 50%)",
+          opacity: 1,
+          transform: "none",
+        } as React.CSSProperties}
+      >
+        {/* before: glow radial */}
+        <div className="absolute inset-0 h-full w-full opacity-40"
+          style={{ backgroundImage: "radial-gradient(circle at bottom center, rgba(255,255,255,0.8), transparent 70%)" }} />
+        {/* after: arc ellipse */}
+        <div className="absolute -left-1/2 top-1/2 w-[200%] rounded-[50%] border-t"
+          style={{ aspectRatio: "1/0.7", borderColor: "rgba(255,255,255,0.1)", background: "#080808" }} />
       </div>
 
     <section id="clients" className="text-center mx-auto max-w-[80rem] px-6 md:px-8">
