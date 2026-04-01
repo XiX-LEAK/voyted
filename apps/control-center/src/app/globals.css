@@ -239,3 +239,4 @@
 .animate-scale-in {
   animation: scale-in 0.3s ease-out both;
 }@keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-33.333%); } }
