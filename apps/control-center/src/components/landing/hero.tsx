@@ -78,12 +78,34 @@ export function LandingHero() {
                 { label: "Messages", active: false, icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M2.5 3A1.5 1.5 0 0 0 1 4.5v7A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 13.5 3h-11ZM2.5 4.5h11l-5.5 4-5.5-4Z" /></svg> },
                 { label: "Analytics", active: false, icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 11.5V13h14v-1.5H1ZM3 9V7.5h2V9H3Zm4-4.5V9H5.5V4.5H7ZM9 6V9H7.5V6H9Zm2-2.5V9h-1.5V3.5H11Zm2 1V9h-1.5V4.5H13Z" /></svg> },
                 { label: "Auto-Reply", active: false, icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h11A1.5 1.5 0 0 1 15 3.5v6A1.5 1.5 0 0 1 13.5 11H9l-3 3v-3H2.5A1.5 1.5 0 0 1 1 9.5v-6Z" /></svg> },
+                { label: "Projets", active: false, icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="#9c9da1"><path d="m11.927 13.232-1.354.78c-.937.54-1.406.811-1.904.917a3.22 3.22 0 0 1-1.338 0c-.498-.106-.967-.376-1.904-.917l-1.354-.78c-.937-.541-1.406-.811-1.747-1.19a3.212 3.212 0 0 1-.669-1.157C1.5 10.401 1.5 9.861 1.5 8.78V7.22c0-1.082 0-1.622.157-2.106.14-.429.368-.823.67-1.157.34-.379.809-.649 1.746-1.19l1.354-.78c.937-.54 1.406-.811 1.904-.917a3.22 3.22 0 0 1 1.338 0c.498.106.967.376 1.904.917l1.354.78c.937.541 1.406.811 1.747 1.19.301.334.53.728.669 1.157.157.484.157 1.024.157 2.106v1.56c0 1.082 0 1.622-.157 2.106-.14.429-.368.823-.67 1.157-.34.379-.809.649-1.746 1.19Zm-5.751-.52c.542.313.862.492 1.075.598V9.853a2.25 2.25 0 0 0-1.224-2.002l-3.02-1.51c-.005.217-.007.5-.007.878v1.56c0 1.183.017 1.438.084 1.642.074.229.196.439.356.617.144.16.358.303 1.383.894l1.353.78Zm2.575.597c.212-.105.532-.284 1.073-.596l1.353-.78c1.026-.592 1.239-.735 1.383-.895.16-.178.282-.389.356-.617.066-.204.084-.459.084-1.642V7.22c0-.378-.002-.661-.006-.878l-3 1.5-.007.003a2.25 2.25 0 0 0-1.236 2.009v3.456Zm3.757-8.402c-.15-.144-.42-.316-1.33-.841l-1.354-.78c-1.025-.592-1.256-.705-1.467-.75a1.72 1.72 0 0 0-.714 0c-.211.045-.442.158-1.467.75l-1.353.78c-.91.525-1.18.697-1.33.84L6.677 6.5l.026.013.29.145a2.25 2.25 0 0 0 2.013 0l.308-.154.009-.004 3.184-1.592Z" /></svg> },
+                { label: "Plus", active: false, icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="#9c9da1"><path d="M3 6.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" /></svg> },
               ].map((item) => (
                 <button key={item.label} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "5px 12px", margin: "0 4px", borderRadius: "6px", background: item.active ? "rgba(255,255,255,0.08)" : "none", border: "none", color: item.active ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.45)", cursor: "pointer", fontSize: "13px", textAlign: "left" }}>
                   <span style={{ color: item.active ? "rgba(255,255,255,0.7)" : "#9c9da1" }}>{item.icon}</span>
                   {item.label}
                 </button>
               ))}
+
+              {/* Favoris section */}
+              <div style={{ margin: '4px 0 0', padding: '0 4px' }}>
+                <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '4px 8px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '11px', fontWeight: 500, borderRadius: '5px' }}>
+                  <span>Favoris</span>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7.00194 10.6239C6.66861 10.8183 6.25 10.5779 6.25 10.192V5.80802C6.25 5.42212 6.66861 5.18169 7.00194 5.37613L10.7596 7.56811C11.0904 7.76105 11.0904 8.23895 10.7596 8.43189L7.00194 10.6239Z" /></svg>
+                </button>
+                {[
+                  { label: 'Lancement rapide', color: '#f5c842' },
+                  { label: 'Auto-relist actif', color: '#9c9da1' },
+                ].map((fav, i) => (
+                  <button key={i} style={{ display: 'flex', alignItems: 'center', gap: '7px', width: '100%', padding: '4px 8px', background: i === 0 ? 'rgba(255,255,255,0.06)' : 'none', border: 'none', borderRadius: '5px', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: '12px', textAlign: 'left' }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14">
+                      <rect x="1" y="1" width="12" height="12" rx="6" stroke={fav.color} strokeWidth="1.5" fill="none" />
+                      <path fill={fav.color} stroke="none" d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 7 z" transform="translate(3.5,3.5)" />
+                    </svg>
+                    {fav.label}
+                  </button>
+                ))}
+              </div>
             </nav>
 
             {/* Main content */}
