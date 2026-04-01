@@ -1,6 +1,7 @@
 import { LandingHeader } from "@/components/landing/header";
 import { LandingHero } from "@/components/landing/hero";
 import { LandingClients } from "@/components/landing/clients";
+import { LandingFeatures } from "@/components/landing/features";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       <main id="skip-nav" style={{ background: "#080808" }}>
         <LandingHero />
         <LandingClients />
+        <LandingFeatures />
         {/* Sections suivantes à ajouter */}
       </main>
     </>
