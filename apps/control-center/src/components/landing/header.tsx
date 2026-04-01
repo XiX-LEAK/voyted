@@ -7,91 +7,140 @@ export function LandingHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-white/[0.06] bg-[#0a0a0a]/80 backdrop-blur-xl backdrop-saturate-150">
-      <nav aria-label="Principal" className="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-5">
-        {/* Logo */}
-        <Link href="/" aria-label="Retour à l'accueil" className="flex items-center gap-2.5 text-white">
-          <div className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-violet-500">
-            <span className="text-[11px] font-black tracking-tight">V</span>
-          </div>
-          <span className="text-[15px] font-semibold tracking-tight">Voyted</span>
-        </Link>
+    <>
+      <header
+        className="fixed top-0 z-50 w-full"
+        style={{
+          background: "rgba(8,8,8,0.92)",
+          backdropFilter: "blur(12px) saturate(150%)",
+          WebkitBackdropFilter: "blur(12px) saturate(150%)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
+        <nav
+          aria-label="Principal"
+          className="relative mx-auto flex h-12 max-w-[1200px] items-center px-4"
+        >
+          <ul className="flex w-full items-center" aria-label="Navigation du site">
+            {/* Logo */}
+            <li className="flex items-center">
+              <Link
+                href="/"
+                aria-label="Retour à l'accueil"
+                className="flex items-center text-white"
+                style={{ WebkitTouchCallout: "none", display: "flex" }}
+              >
+                <svg height="22" viewBox="0 0 120 30" fill="currentColor" aria-label="Voyted">
+                  <text x="0" y="24" fontSize="22" fontWeight="700" fontFamily="-apple-system,BlinkMacSystemFont,'Inter',sans-serif" letterSpacing="-0.5">
+                    Voyted
+                  </text>
+                </svg>
+              </Link>
+            </li>
 
-        {/* Nav items — desktop */}
-        <div className="hidden items-center gap-0.5 md:flex">
-          {[
-            { label: "Fonctionnalités", href: "#features" },
-            { label: "Tarifs", href: "#pricing" },
-            { label: "Roadmap", href: "#roadmap" },
-            { label: "Contact", href: "mailto:contact@voyted.app" },
-          ].map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-md px-3 py-1.5 text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
+            {/* Right side */}
+            <div className="ml-auto flex items-center">
+              {/* Nav links — desktop */}
+              <div className="hidden items-center md:flex">
+                {[
+                  { label: "Fonctionnalités", href: "#features" },
+                  { label: "Tarifs", href: "#pricing" },
+                  { label: "Roadmap", href: "#roadmap" },
+                  { label: "Contact", href: "mailto:contact@voyted.app" },
+                ].map((item) => (
+                  <li key={item.href} className="list-none">
+                    <a
+                      href={item.href}
+                      className="block px-3 py-1.5 text-[13px] font-medium text-[rgba(255,255,255,0.6)] transition-colors hover:text-white"
+                      style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif" }}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </div>
 
-        {/* Right buttons */}
-        <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className="hidden rounded-md px-3 py-1.5 text-[13px] font-medium text-zinc-400 transition-colors hover:text-white md:block"
+              <div className="mx-3 hidden h-4 w-px bg-white/10 md:block" />
+
+              {/* Buttons */}
+              <div className="flex items-center gap-1.5">
+                <li className="hidden list-none md:block">
+                  <Link
+                    href="/login"
+                    className="block px-3 py-1.5 text-[13px] font-medium text-[rgba(255,255,255,0.6)] transition-colors hover:text-white"
+                    style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif" }}
+                  >
+                    Se connecter
+                  </Link>
+                </li>
+                <li className="list-none">
+                  <Link
+                    href="/register"
+                    className="inline-flex h-7 items-center rounded-[6px] bg-white px-3 text-[13px] font-semibold text-black transition-colors hover:bg-zinc-100"
+                    style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif" }}
+                  >
+                    S&apos;inscrire
+                  </Link>
+                </li>
+
+                {/* Mobile hamburger */}
+                <li className="list-none md:hidden">
+                  <button
+                    type="button"
+                    onClick={() => setMobileOpen(!mobileOpen)}
+                    aria-expanded={mobileOpen}
+                    className="flex h-8 w-8 items-center justify-center text-[rgba(255,255,255,0.6)] hover:text-white"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <rect
+                        x="1" y="7.5" width="14" height="1" rx="0.5"
+                        style={{
+                          transformOrigin: "center",
+                          transition: "160ms cubic-bezier(0.16,1,0.3,1)",
+                          transform: mobileOpen ? "translateY(0) rotate(45deg)" : "translateY(-3.5px)",
+                        }}
+                      />
+                      <rect
+                        x="1" y="7.5" width="14" height="1" rx="0.5"
+                        style={{
+                          transformOrigin: "center",
+                          transition: "160ms cubic-bezier(0.16,1,0.3,1)",
+                          transform: mobileOpen ? "translateY(0) rotate(-45deg)" : "translateY(3.5px)",
+                        }}
+                      />
+                    </svg>
+                  </button>
+                </li>
+              </div>
+            </div>
+          </ul>
+        </nav>
+
+        {/* Mobile menu */}
+        {mobileOpen && (
+          <div
+            className="border-t border-white/[0.06] px-4 py-3 md:hidden"
+            style={{ background: "rgba(8,8,8,0.98)" }}
           >
-            Se connecter
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-md bg-white px-3 py-1.5 text-[13px] font-semibold text-black transition-colors hover:bg-zinc-100"
-          >
-            S&apos;inscrire
-          </Link>
-
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            className="ml-1 flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 hover:text-white md:hidden"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-expanded={mobileOpen}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <rect x="1" y="4.5" width="14" height="1" rx="0.5" style={{ transformOrigin: "center", transition: "160ms", transform: mobileOpen ? "translateY(3px) rotate(45deg)" : "none" }} />
-              <rect x="1" y="10.5" width="14" height="1" rx="0.5" style={{ transformOrigin: "center", transition: "160ms", transform: mobileOpen ? "translateY(-3px) rotate(-45deg)" : "none" }} />
-            </svg>
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="border-t border-white/[0.06] bg-[#0a0a0a] px-5 py-4 md:hidden">
-          <div className="flex flex-col gap-1">
             {[
               { label: "Fonctionnalités", href: "#features" },
               { label: "Tarifs", href: "#pricing" },
               { label: "Roadmap", href: "#roadmap" },
               { label: "Contact", href: "mailto:contact@voyted.app" },
-            ].map(item => (
-              <Link
+              { label: "Se connecter", href: "/login" },
+            ].map((item) => (
+              <a
                 key={item.href}
                 href={item.href}
-                className="rounded-md px-3 py-2 text-sm text-zinc-400 hover:text-white"
                 onClick={() => setMobileOpen(false)}
+                className="block py-2.5 text-sm text-[rgba(255,255,255,0.6)] hover:text-white"
               >
                 {item.label}
-              </Link>
+              </a>
             ))}
-            <div className="mt-2 border-t border-white/[0.06] pt-2">
-              <Link href="/login" className="block rounded-md px-3 py-2 text-sm text-zinc-400 hover:text-white">
-                Se connecter
-              </Link>
-            </div>
           </div>
-        </div>
-      )}
-    </header>
+        )}
+      </header>
+    </>
   );
 }
