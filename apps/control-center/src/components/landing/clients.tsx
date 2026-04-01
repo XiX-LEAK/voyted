@@ -3,28 +3,28 @@ const VINTED_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53M
 export function LandingClients() {
   return (
     <>
-      {/* Glow halo — exact Vinteer style, couleur blanche */}
-      <div
-        className="pointer-events-none relative -z-[2] mx-auto h-[50rem] overflow-hidden my-[-20.8rem] before:absolute before:inset-0 before:h-full before:w-full before:opacity-40 after:absolute after:-left-1/2 after:top-1/2 after:w-[200%] after:rounded-[50%] after:border-t"
-        style={{
-          maskImage: "radial-gradient(ellipse at center center, #000, transparent 50%)",
-          WebkitMaskImage: "radial-gradient(ellipse at center center, #000, transparent 50%)",
-          opacity: 1,
-          ["--before-bg" as string]: "radial-gradient(circle at bottom center, rgba(255,255,255,0.9), transparent 70%)",
-        } as React.CSSProperties}
-      >
-        {/* Glow blanc */}
+      {/* Glow halo blanc */}
+      <div className="pointer-events-none relative mx-auto overflow-hidden" style={{ height: "400px", marginBottom: "-300px" }}>
+        {/* Glow radial blanc */}
         <div
-          className="absolute inset-0 h-full w-full opacity-40"
-          style={{ backgroundImage: "radial-gradient(circle at bottom center, rgba(255,255,255,0.95), transparent 65%)" }}
+          className="absolute bottom-0 left-1/2 -translate-x-1/2"
+          style={{
+            width: "600px",
+            height: "300px",
+            background: "radial-gradient(ellipse at center bottom, rgba(255,255,255,0.25) 0%, transparent 70%)",
+            filter: "blur(20px)",
+          }}
         />
         {/* Arc ellipse */}
         <div
-          className="absolute -left-1/2 top-1/2 w-[200%] rounded-[50%] border-t"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2"
           style={{
-            aspectRatio: "1/0.7",
-            borderColor: "rgba(255,255,255,0.1)",
-            background: "#080808",
+            width: "900px",
+            height: "400px",
+            borderRadius: "50%",
+            border: "1px solid rgba(255,255,255,0.08)",
+            background: "transparent",
+            transform: "translateX(-50%) translateY(50%)",
           }}
         />
       </div>
