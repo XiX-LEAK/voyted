@@ -199,6 +199,27 @@ export function LandingFeatures() {
               <div className="pointer-events-none absolute inset-0 transition-all duration-300 group-hover:bg-white/[.03]" />
             </div>
 
+
+            {/* Card 5 — Retina dots + Gestion de Stock */}
+            <div className={`${cardClass} col-span-3 lg:col-span-1`}>
+              <div className="relative overflow-hidden h-[200px]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 322 322" className="absolute inset-0 text-white/20">
+                  {Array.from({length: 8}).map((_, row) => 
+                    Array.from({length: 8}).map((_, col) => (
+                      <rect key={row * 8 + col} width="39" height="39" x={col * 40 + 1} y={row * 40 + 1} fill="currentColor" strokeWidth="0" opacity={Math.max(0, 0.15 - (Math.abs(row - 3) + Math.abs(col - 3)) * 0.025)} />
+                    ))
+                  )}
+                </svg>
+              </div>
+              <div className="p-4">
+                <div className="pointer-events-none z-10 flex flex-col gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/80"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"/><path d="m7 16.5-4.74-2.85"/><path d="m7 16.5 5-3"/><path d="M7 16.5v5.17"/><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"/><path d="m17 16.5-5-3"/><path d="m17 16.5 4.74-2.85"/><path d="M17 16.5v5.17"/><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"/><path d="M12 8 7.26 5.15"/><path d="m12 8 4.74-2.85"/><path d="M12 13.5V8"/></svg>
+                  <h3 className="text-xl font-semibold text-white">Gestion de Stock</h3>
+                  <p className="max-w-lg text-neutral-400">SKU, lots et décrémentation automatique.</p>
+                </div>
+              </div>
+              <div className="pointer-events-none absolute inset-0 transition-all duration-300 group-hover:bg-white/[.03]" />
+            </div>
           </div>
         </div>
       </div>
