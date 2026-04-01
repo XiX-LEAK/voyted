@@ -11,44 +11,32 @@ export function LandingHero() {
           <span className="hidden sm:block">Le logiciel de gestion<br />Vinted pour les pros</span>
         </h1>
 
-        {/* Description row */}
-        <div className="flex items-start justify-between gap-8">
-          <p style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif", fontSize: "15px", lineHeight: 1.65, color: "rgba(255,255,255,0.45)", maxWidth: "340px" }}>
-            Conçu pour les vendeurs Vinted. Automatise ta gestion, suis tes marges réelles et scale ton business d&apos;achat-revente.
-          </p>
-          <Link href="#features" className="hidden items-center gap-3 md:flex" style={{ textDecoration: "none" }}>
-            <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#18CB96", boxShadow: "0 0 0 3px rgba(24,203,150,0.2)", animation: "pulse 2s infinite", flexShrink: 0 }} />
-            <span style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif", fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>L&apos;extension Chrome est morte</span>
-            <span style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif", fontSize: "13px", color: "rgba(255,255,255,0.25)" }}>voyted.app/token →</span>
-          </Link>
-        </div>
+        {/* Subtitle */}
+        <p style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif", fontSize: "15px", lineHeight: 1.65, color: "rgba(255,255,255,0.45)", maxWidth: "460px", marginBottom: "32px" }}>
+          Conçu pour les vendeurs Vinted. Automatise ta gestion, suis tes marges réelles et scale ton business d&apos;achat-revente.
+        </p>
 
-        {/* CTA */}
-        <div className="mt-8 flex items-center gap-3">
-          <Link href="/register" className="inline-flex h-9 items-center rounded-[7px] px-4 text-[13px] font-semibold text-black transition-opacity hover:opacity-90" style={{ background: "#ffffff" }}>Commencer gratuitement</Link>
-          <Link href="/login" className="inline-flex h-9 items-center rounded-[7px] px-4 text-[13px] font-medium transition-colors" style={{ color: "rgba(255,255,255,0.55)", border: "1px solid rgba(255,255,255,0.1)" }}>Se connecter</Link>
-        </div>
+        {/* Single CTA */}
+        <Link
+          href="/register"
+          className="inline-flex h-9 items-center rounded-[7px] px-4 text-[13px] font-semibold text-black transition-opacity hover:opacity-90"
+          style={{ background: "#ffffff" }}
+        >
+          Commencer gratuitement
+        </Link>
       </div>
 
-      {/* Frame — exact Linear layout */}
+      {/* Frame */}
       <div className="relative mt-14" style={{ marginLeft: "-20px", marginRight: "-20px" }}>
-        {/* Grain background image from Linear CDN */}
-        <img src="https://linear.app/cdn-cgi/imagedelivery/fO02fVwohEs9s9UHFwon6A/c7b144b7-4ef0-4991-9bcb-617c6a37d200/f=auto,dpr=2,q=95,fit=scale-down,metadata=none" alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ opacity: 0.08 }} />
-        {/* Shadow overlay */}
-        <img src="https://linear.app/cdn-cgi/imagedelivery/fO02fVwohEs9s9UHFwon6A/6600ca96-e49b-4fd9-c03a-7979faddad00/f=auto,dpr=2,q=95,fit=scale-down,metadata=none" alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-cover" />
-        <img src="https://linear.app/cdn-cgi/imagedelivery/fO02fVwohEs9s9UHFwon6A/c7fa8f5f-d439-4329-6a65-de549b51e300/f=auto,dpr=2,q=95,fit=scale-down,metadata=none" alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-cover" />
-
         {/* Bottom fade */}
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-40" style={{ background: "linear-gradient(to top, #080808 20%, transparent)" }} />
 
-        {/* App window */}
-        <div className="relative mx-auto overflow-hidden rounded-t-xl" style={{ maxWidth: "1100px", border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", background: "#111113" }}>
-          {/* Grain overlay inside */}
-          <div className="pointer-events-none absolute inset-0 z-0" style={{ background: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E\")", opacity: 0.5 }} />
-
+        {/* App window — fond noir comme demandé, image à ajouter après */}
+        <div className="relative mx-auto overflow-hidden rounded-t-xl" style={{ maxWidth: "1100px", border: "1px solid rgba(255,255,255,0.08)", borderBottom: "none", background: "#000" }}>
           <div className="relative flex h-[460px]">
-            {/* Sidebar — exact Linear style */}
-            <nav style={{ width: "220px", flexShrink: 0, background: "#111113", borderRight: "1px solid rgba(255,255,255,0.07)", padding: "12px 0", display: "flex", flexDirection: "column", gap: "2px" }}>
+
+            {/* Sidebar */}
+            <nav style={{ width: "220px", flexShrink: 0, background: "#0d0d0d", borderRight: "1px solid rgba(255,255,255,0.07)", padding: "12px 0", display: "flex", flexDirection: "column", gap: "2px" }}>
               {/* Workspace header */}
               <div style={{ padding: "0 12px 8px", borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: "4px" }}>
                 <div className="flex items-center justify-between">
@@ -58,11 +46,9 @@ export function LandingHero() {
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="rgba(255,255,255,0.3)"><path d="M4.53 5.47a.75.75 0 0 0-1.06 1.06l4 4a.75.75 0 0 0 1.054.007l4-3.903a.75.75 0 0 0-1.048-1.073l-3.47 3.385L4.53 5.47Z" /></svg>
                   </button>
                   <div className="flex items-center gap-1">
-                    {/* Search icon */}
                     <button style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", padding: "3px", borderRadius: "4px" }}>
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M7 2C9.76142 2 12 4.23858 12 7C12 8.11012 11.6375 9.13519 11.0254 9.96484L13.7803 12.7197C14.0725 13.0118 14.0725 13.4882 13.7803 13.7803C13.4882 14.0725 13.0118 14.0725 12.7197 13.7803L9.96484 11.0254C9.13519 11.6375 8.11012 12 7 12C4.23858 12 2 9.76142 2 7C2 4.23858 4.23858 2 7 2ZM7 3.5C5.067 3.5 3.5 5.067 3.5 7C3.5 8.933 5.067 10.5 7 10.5C8.933 10.5 10.5 8.933 10.5 7C10.5 5.067 8.933 3.5 7 3.5Z" /></svg>
                     </button>
-                    {/* New issue icon */}
                     <button style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", padding: "3px", borderRadius: "4px" }}>
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M7.25 1C7.66414 1 7.99988 1.33589 8 1.75C8 2.16421 7.66421 2.5 7.25 2.5H4.75C3.50745 2.5 2.50012 3.50744 2.5 4.75V11.25C2.5 12.4926 3.50736 13.5 4.75 13.5H11.25C12.4926 13.5 13.5 12.4926 13.5 11.25V8.75C13.5001 8.33589 13.8359 8 14.25 8C14.6641 8 14.9999 8.33589 15 8.75V11.25C15 13.3211 13.3211 15 11.25 15H4.75C2.67893 15 1 13.3211 1 11.25V4.75C1.00012 2.67905 2.67899 1 4.75 1H7.25Z" /><path fillRule="evenodd" clipRule="evenodd" d="M13.4326 1.26953C13.7913 0.910937 14.3728 0.910883 14.7314 1.26953C15.0897 1.6282 15.0899 2.20981 14.7314 2.56836L9.2373 8.06152C8.68101 8.6177 7.94043 8.95161 7.15527 9C7.06754 9.0052 6.99468 8.93248 7 8.84473C7.04847 8.05961 7.38232 7.31897 7.93848 6.7627L13.4326 1.26953Z" /></svg>
                     </button>
@@ -87,19 +73,19 @@ export function LandingHero() {
                 </button>
               ))}
 
-              {/* Favoris section */}
-              <div style={{ margin: '4px 0 0', padding: '0 4px' }}>
-                <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '4px 8px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '11px', fontWeight: 500, borderRadius: '5px' }}>
+              {/* Favoris */}
+              <div style={{ margin: "4px 0 0", padding: "0 4px" }}>
+                <button style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", padding: "4px 8px", background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", fontSize: "11px", fontWeight: 500, borderRadius: "5px" }}>
                   <span>Favoris</span>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7.00194 10.6239C6.66861 10.8183 6.25 10.5779 6.25 10.192V5.80802C6.25 5.42212 6.66861 5.18169 7.00194 5.37613L10.7596 7.56811C11.0904 7.76105 11.0904 8.23895 10.7596 8.43189L7.00194 10.6239Z" /></svg>
                 </button>
                 {[
-                  { label: 'Stock en vente', color: '#f5c842', active: true },
-                  { label: 'Tâches auto-relist', color: '#9c9da1', active: false },
-                  { label: 'Suivi commandes', color: '#4ade80', active: false },
-                  { label: 'Messages clients', color: '#ef4444', active: false },
+                  { label: "Stock en vente", color: "#f5c842", active: true },
+                  { label: "Tâches auto-relist", color: "#9c9da1", active: false },
+                  { label: "Suivi commandes", color: "#4ade80", active: false },
+                  { label: "Messages clients", color: "#ef4444", active: false },
                 ].map((fav, i) => (
-                  <button key={i} style={{ display: 'flex', alignItems: 'center', gap: '7px', width: '100%', padding: '4px 8px', background: fav.active ? 'rgba(255,255,255,0.06)' : 'none', border: 'none', borderRadius: '5px', color: fav.active ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '12px', textAlign: 'left' }}>
+                  <button key={i} style={{ display: "flex", alignItems: "center", gap: "7px", width: "100%", padding: "4px 8px", background: fav.active ? "rgba(255,255,255,0.06)" : "none", border: "none", borderRadius: "5px", color: fav.active ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: "12px", textAlign: "left" }}>
                     <svg width="14" height="14" viewBox="0 0 14 14">
                       <rect x="1" y="1" width="12" height="12" rx="6" stroke={fav.color} strokeWidth="1.5" fill="none" />
                       <path fill={fav.color} stroke="none" d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 7 z" transform="translate(3.5,3.5)" />
@@ -110,95 +96,11 @@ export function LandingHero() {
               </div>
             </nav>
 
-            {/* Main content — Issue view style Linear */}
-            <div className="flex-1 overflow-hidden" style={{ background: "#111113", display: "flex" }}>
-              {/* Issue list */}
-              <div style={{ flex: 1, borderRight: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
-                {/* Header */}
-                <div style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <svg width="14" height="14" viewBox="0 0 14 14">
-                    <rect x="1" y="1" width="12" height="12" rx="6" stroke="#f5c842" strokeWidth="1.5" fill="none" />
-                    <path fill="#f5c842" stroke="none" d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 7 z" transform="translate(3.5,3.5)" />
-                  </svg>
-                  <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>Stock en vente</span>
-                  <span style={{ marginLeft: "auto", fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>34</span>
-                </div>
-
-                {/* Issue rows */}
-                {[
-                  { id: "VY-001", title: "T-shirt Nike", price: "18 €", priority: "#f5c842", label: "Mode" },
-                  { id: "VY-002", title: "Jean Levi's", price: "35 €", priority: "#ef4444", label: "Mode" },
-                  { id: "VY-003", title: "Veste Carhartt", price: "55 €", priority: "#9c9da1", label: "Workwear" },
-                  { id: "VY-004", title: "Sneakers Vans", price: "28 €", priority: "#9c9da1", label: "Chaussures" },
-                  { id: "VY-005", title: "Pull Ralph Lauren", price: "22 €", priority: "#9c9da1", label: "Mode" },
-                  { id: "VY-006", title: "Sac Gucci", price: "85 €", priority: "#ef4444", label: "Luxe" },
-                ].map((issue, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)", cursor: "default" }}>
-                    {/* Priority dot */}
-                    <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: issue.priority, flexShrink: 0 }} />
-                    {/* Status circle */}
-                    <svg width="12" height="12" viewBox="0 0 14 14" style={{ flexShrink: 0 }}>
-                      <rect x="1" y="1" width="12" height="12" rx="6" stroke="#18CB96" strokeWidth="1.5" fill="none" />
-                      <path fill="#18CB96" stroke="none" d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 7 z" transform="translate(3.5,3.5)" />
-                    </svg>
-                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", flexShrink: 0, fontFamily: "monospace" }}>{issue.id}</span>
-                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{issue.title}</span>
-                    <span style={{ fontSize: "10px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", borderRadius: "4px", padding: "1px 6px", flexShrink: 0 }}>{issue.label}</span>
-                    <span style={{ fontSize: "12px", color: "#18CB96", fontWeight: 600, flexShrink: 0 }}>{issue.price}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Issue detail panel */}
-              <div style={{ width: "260px", flexShrink: 0, padding: "12px 16px", overflow: "hidden" }}>
-                <div style={{ marginBottom: "12px" }}>
-                  <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.85)" }}>T-shirt Nike</span>
-                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginTop: "4px", lineHeight: 1.5 }}>
-                    Taille M, très bon état. Lavé une seule fois. Expédié en 48h via Mondial Relay.
-                  </p>
-                </div>
-
-                {/* Properties */}
-                {[
-                  { label: "Statut", value: "En vente", color: "#18CB96" },
-                  { label: "Prix", value: "18 €", color: "rgba(255,255,255,0.7)" },
-                  { label: "Vues", value: "142", color: "rgba(255,255,255,0.7)" },
-                  { label: "Favoris", value: "8", color: "rgba(255,255,255,0.7)" },
-                  { label: "Marque", value: "Nike", color: "rgba(255,255,255,0.7)" },
-                  { label: "Taille", value: "M", color: "rgba(255,255,255,0.7)" },
-                ].map((prop, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{prop.label}</span>
-                    <span style={{ fontSize: "11px", color: prop.color }}>{prop.value}</span>
-                  </div>
-                ))}
-
-                {/* Activity */}
-                <div style={{ marginTop: "10px" }}>
-                  <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.25)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Activité</p>
-                  {[
-                    { text: "Mis en vente", time: "il y a 3j" },
-                    { text: "8 personnes ont ajouté aux favoris", time: "il y a 1j" },
-                    { text: "142 vues au total", time: "aujourd'hui" },
-                  ].map((act, i) => (
-                    <div key={i} style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", padding: "3px 0", display: "flex", justifyContent: "space-between" }}>
-                      <span>{act.text}</span>
-                      <span style={{ color: "rgba(255,255,255,0.2)" }}>{act.time}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            {/* Main content — fond noir, image à ajouter après */}
+            <div className="flex-1" style={{ background: "#000" }} />
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes pulse {
-          0%,100% { box-shadow: 0 0 0 2px rgba(24,203,150,0.25); }
-          50% { box-shadow: 0 0 0 5px rgba(24,203,150,0.1); }
-        }
-      `}</style>
     </section>
   );
 }
