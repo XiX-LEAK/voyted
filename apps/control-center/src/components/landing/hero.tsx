@@ -94,10 +94,12 @@ export function LandingHero() {
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7.00194 10.6239C6.66861 10.8183 6.25 10.5779 6.25 10.192V5.80802C6.25 5.42212 6.66861 5.18169 7.00194 5.37613L10.7596 7.56811C11.0904 7.76105 11.0904 8.23895 10.7596 8.43189L7.00194 10.6239Z" /></svg>
                 </button>
                 {[
-                  { label: 'Lancement rapide', color: '#f5c842' },
-                  { label: 'Auto-relist actif', color: '#9c9da1' },
+                  { label: 'Stock en vente', color: '#f5c842', active: true },
+                  { label: 'Tâches auto-relist', color: '#9c9da1', active: false },
+                  { label: 'Suivi commandes', color: '#4ade80', active: false },
+                  { label: 'Messages clients', color: '#ef4444', active: false },
                 ].map((fav, i) => (
-                  <button key={i} style={{ display: 'flex', alignItems: 'center', gap: '7px', width: '100%', padding: '4px 8px', background: i === 0 ? 'rgba(255,255,255,0.06)' : 'none', border: 'none', borderRadius: '5px', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: '12px', textAlign: 'left' }}>
+                  <button key={i} style={{ display: 'flex', alignItems: 'center', gap: '7px', width: '100%', padding: '4px 8px', background: fav.active ? 'rgba(255,255,255,0.06)' : 'none', border: 'none', borderRadius: '5px', color: fav.active ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '12px', textAlign: 'left' }}>
                     <svg width="14" height="14" viewBox="0 0 14 14">
                       <rect x="1" y="1" width="12" height="12" rx="6" stroke={fav.color} strokeWidth="1.5" fill="none" />
                       <path fill={fav.color} stroke="none" d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 7 z" transform="translate(3.5,3.5)" />
@@ -108,40 +110,83 @@ export function LandingHero() {
               </div>
             </nav>
 
-            {/* Main content */}
-            <div className="flex-1 overflow-hidden" style={{ background: "#111113" }}>
-              {/* Top bar */}
-              <div style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>Mon Stock</span>
-                <div style={{ display: "flex", gap: "6px" }}>
-                  {["Filtrer", "Trier"].map(btn => (
-                    <button key={btn} style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "5px", padding: "3px 8px", cursor: "pointer" }}>{btn}</button>
+            {/* Main content — Issue view style Linear */}
+            <div className="flex-1 overflow-hidden" style={{ background: "#111113", display: "flex" }}>
+              {/* Issue list */}
+              <div style={{ flex: 1, borderRight: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
+                {/* Header */}
+                <div style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14">
+                    <rect x="1" y="1" width="12" height="12" rx="6" stroke="#f5c842" strokeWidth="1.5" fill="none" />
+                    <path fill="#f5c842" stroke="none" d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 7 z" transform="translate(3.5,3.5)" />
+                  </svg>
+                  <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>Stock en vente</span>
+                  <span style={{ marginLeft: "auto", fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>34</span>
+                </div>
+
+                {/* Issue rows */}
+                {[
+                  { id: "VY-001", title: "T-shirt Nike", price: "18 €", priority: "#f5c842", label: "Mode" },
+                  { id: "VY-002", title: "Jean Levi's", price: "35 €", priority: "#ef4444", label: "Mode" },
+                  { id: "VY-003", title: "Veste Carhartt", price: "55 €", priority: "#9c9da1", label: "Workwear" },
+                  { id: "VY-004", title: "Sneakers Vans", price: "28 €", priority: "#9c9da1", label: "Chaussures" },
+                  { id: "VY-005", title: "Pull Ralph Lauren", price: "22 €", priority: "#9c9da1", label: "Mode" },
+                  { id: "VY-006", title: "Sac Gucci", price: "85 €", priority: "#ef4444", label: "Luxe" },
+                ].map((issue, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)", cursor: "default" }}>
+                    {/* Priority dot */}
+                    <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: issue.priority, flexShrink: 0 }} />
+                    {/* Status circle */}
+                    <svg width="12" height="12" viewBox="0 0 14 14" style={{ flexShrink: 0 }}>
+                      <rect x="1" y="1" width="12" height="12" rx="6" stroke="#18CB96" strokeWidth="1.5" fill="none" />
+                      <path fill="#18CB96" stroke="none" d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 7 z" transform="translate(3.5,3.5)" />
+                    </svg>
+                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", flexShrink: 0, fontFamily: "monospace" }}>{issue.id}</span>
+                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{issue.title}</span>
+                    <span style={{ fontSize: "10px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", borderRadius: "4px", padding: "1px 6px", flexShrink: 0 }}>{issue.label}</span>
+                    <span style={{ fontSize: "12px", color: "#18CB96", fontWeight: 600, flexShrink: 0 }}>{issue.price}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Issue detail panel */}
+              <div style={{ width: "260px", flexShrink: 0, padding: "12px 16px", overflow: "hidden" }}>
+                <div style={{ marginBottom: "12px" }}>
+                  <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.85)" }}>T-shirt Nike</span>
+                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginTop: "4px", lineHeight: 1.5 }}>
+                    Taille M, très bon état. Lavé une seule fois. Expédié en 48h via Mondial Relay.
+                  </p>
+                </div>
+
+                {/* Properties */}
+                {[
+                  { label: "Statut", value: "En vente", color: "#18CB96" },
+                  { label: "Prix", value: "18 €", color: "rgba(255,255,255,0.7)" },
+                  { label: "Vues", value: "142", color: "rgba(255,255,255,0.7)" },
+                  { label: "Favoris", value: "8", color: "rgba(255,255,255,0.7)" },
+                  { label: "Marque", value: "Nike", color: "rgba(255,255,255,0.7)" },
+                  { label: "Taille", value: "M", color: "rgba(255,255,255,0.7)" },
+                ].map((prop, i) => (
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{prop.label}</span>
+                    <span style={{ fontSize: "11px", color: prop.color }}>{prop.value}</span>
+                  </div>
+                ))}
+
+                {/* Activity */}
+                <div style={{ marginTop: "10px" }}>
+                  <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.25)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Activité</p>
+                  {[
+                    { text: "Mis en vente", time: "il y a 3j" },
+                    { text: "8 personnes ont ajouté aux favoris", time: "il y a 1j" },
+                    { text: "142 vues au total", time: "aujourd'hui" },
+                  ].map((act, i) => (
+                    <div key={i} style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", padding: "3px 0", display: "flex", justifyContent: "space-between" }}>
+                      <span>{act.text}</span>
+                      <span style={{ color: "rgba(255,255,255,0.2)" }}>{act.time}</span>
+                    </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Stats row */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "8px", padding: "10px 16px" }}>
-                {[{ l: "Revenu", v: "1 247 €", c: "#18CB96" }, { l: "Articles", v: "34", c: "rgba(255,255,255,0.7)" }, { l: "Ventes", v: "12", c: "rgba(255,255,255,0.7)" }, { l: "Marge", v: "+28%", c: "#18CB96" }].map((s, i) => (
-                  <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "8px", padding: "8px 10px" }}>
-                    <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", margin: 0 }}>{s.l}</p>
-                    <p style={{ fontSize: "15px", fontWeight: 700, color: s.c, margin: "2px 0 0" }}>{s.v}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Items list */}
-              <div style={{ margin: "0 16px", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", overflow: "hidden" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: "8px", padding: "6px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}>
-                  {["Article", "Prix", "Statut"].map(h => <span key={h} style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</span>)}
-                </div>
-                {[["T-shirt Nike", "18 €"], ["Jean Levi's", "35 €"], ["Veste Carhartt", "55 €"], ["Sneakers Vans", "28 €"], ["Pull Ralph Lauren", "22 €"]].map(([name, price], i) => (
-                  <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: "8px", alignItems: "center", padding: "7px 12px", borderBottom: i < 4 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>{name}</span>
-                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{price}</span>
-                    <span style={{ fontSize: "10px", background: "rgba(24,203,150,0.1)", color: "#18CB96", borderRadius: "20px", padding: "2px 7px" }}>En vente</span>
-                  </div>
-                ))}
               </div>
             </div>
           </div>
