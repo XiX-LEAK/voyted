@@ -1,113 +1,178 @@
 import Link from "next/link";
 
-const tickerItems = [
-  "T-shirt Nike +8€",
-  "Jean Levi's +18€",
-  "Veste Carhartt +32€",
-  "Sneakers Vans +12€",
-  "Pull Ralph Lauren +25€",
-  "Sac Gucci +85€",
-  "Veste Zara +12€",
-  "Chaussures Adidas +22€",
-];
-
 export function LandingHero() {
   return (
     <section
       id="hero"
-      className="relative flex flex-col items-center overflow-hidden px-4 pb-0 pt-28 text-center"
-      style={{ background: "linear-gradient(to bottom, #0d0d0d 0%, #080808 100%)" }}
+      className="relative overflow-hidden px-5 pb-0 pt-[120px]"
+      style={{ background: "#080808" }}
     >
-      {/* Badge */}
-      <div
-        className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] font-medium"
-        style={{
-          background: "rgba(24, 203, 150, 0.1)",
-          border: "1px solid rgba(24, 203, 150, 0.2)",
-          color: "#18CB96",
-        }}
-      >
-        <span>✨ L&apos;Outil Vinted pour les Pros</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
-        </svg>
-      </div>
+      <div className="mx-auto max-w-[1100px]">
 
-      {/* H1 */}
-      <h1
-        className="mb-6 max-w-[700px] text-[clamp(2.5rem,6vw,4.5rem)] font-black leading-[1.05] tracking-[-0.03em]"
-        style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif" }}
-      >
-        <span className="text-white">Domine Vinted.</span>
-        <br />
-        <span style={{ color: "#18CB96" }}>Maximise tes profits.</span>
-      </h1>
-
-      {/* Subtitle */}
-      <p
-        className="mb-8 max-w-[520px] text-[15px] leading-[1.7]"
-        style={{ color: "rgba(255,255,255,0.5)", fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif" }}
-      >
-        Arrête de perdre de l&apos;argent avec des tableaux Excel. Automatise ta comptabilité,
-        suis tes marges réelles et scale ton business d&apos;achat-revente.
-      </p>
-
-      {/* CTA */}
-      <div className="mb-8 flex items-center gap-4">
-        <Link
-          href="/register"
-          className="inline-flex h-10 items-center gap-2 rounded-[8px] px-5 text-[14px] font-semibold text-black transition-opacity hover:opacity-90"
-          style={{ background: "#18CB96" }}
+        {/* Big title — exact Linear style */}
+        <h1
+          style={{
+            fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif",
+            fontSize: "clamp(2.8rem, 7vw, 5.5rem)",
+            fontWeight: 800,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.0,
+            color: "rgba(255,255,255,0.93)",
+            marginBottom: "20px",
+          }}
         >
-          Commencer gratuitement
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
-          </svg>
-        </Link>
-      </div>
+          <span className="block sm:hidden">
+            Le logiciel de<br />gestion Vinted<br />pour les pros
+          </span>
+          <span className="hidden sm:block">
+            Le logiciel de gestion<br />Vinted pour les pros
+          </span>
+        </h1>
 
-      {/* Social proof */}
-      <div className="mb-12 flex items-center gap-3">
-        {/* Avatars */}
-        <div className="flex -space-x-2">
-          {["#7c3aed", "#059669", "#dc2626", "#d97706"].map((color, i) => (
+        {/* Description row — same layout as Linear */}
+        <div className="flex items-start justify-between gap-8">
+          <p
+            style={{
+              fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif",
+              fontSize: "15px",
+              lineHeight: 1.65,
+              color: "rgba(255,255,255,0.45)",
+              maxWidth: "340px",
+            }}
+          >
+            Conçu pour les vendeurs Vinted. Automatise ta gestion, suis tes marges réelles et scale ton business d&apos;achat-revente.
+          </p>
+
+          {/* Feature callout link — like "Issue tracking is dead" */}
+          <Link
+            href="#features"
+            className="hidden items-center gap-3 md:flex"
+            style={{ textDecoration: "none" }}
+          >
             <div
-              key={i}
-              className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#080808] text-[10px] font-bold text-white"
-              style={{ background: color }}
-            >
-              {["J", "M", "A", "T"][i]}
-            </div>
-          ))}
-        </div>
-        <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span className="font-semibold text-white">+1300</span> vendeurs pro nous font confiance
-        </p>
-      </div>
-
-      {/* Ticker */}
-      <div
-        className="group relative w-full overflow-hidden py-4"
-        style={{ maskImage: "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)" }}
-      >
-        <div className="flex animate-[marquee_25s_linear_infinite] gap-3 group-hover:[animation-play-state:paused]"
-          style={{ width: "max-content" }}>
-          {[...tickerItems, ...tickerItems, ...tickerItems].map((item, i) => (
-            <span
-              key={i}
-              className="inline-flex h-9 items-center rounded-full px-4 text-[13px] font-medium whitespace-nowrap"
+              className="flex-shrink-0"
               style={{
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: "rgba(255,255,255,0.7)",
+                width: "7px",
+                height: "7px",
+                borderRadius: "50%",
+                background: "#18CB96",
+                boxShadow: "0 0 0 2px rgba(24,203,150,0.25)",
+                animation: "pulse 2s infinite",
+              }}
+            />
+            <span
+              style={{
+                fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif",
+                fontSize: "13px",
+                color: "rgba(255,255,255,0.5)",
               }}
             >
-              {item}
+              L&apos;extension Chrome est morte
             </span>
-          ))}
+            <span
+              style={{
+                fontFamily: "-apple-system,BlinkMacSystemFont,'Inter',sans-serif",
+                fontSize: "13px",
+                color: "rgba(255,255,255,0.25)",
+              }}
+            >
+              voyted.app/token →
+            </span>
+          </Link>
+        </div>
+
+        {/* CTA buttons */}
+        <div className="mt-8 flex items-center gap-3">
+          <Link
+            href="/register"
+            className="inline-flex h-9 items-center rounded-[7px] px-4 text-[13px] font-semibold text-black transition-opacity hover:opacity-90"
+            style={{ background: "#ffffff" }}
+          >
+            Commencer gratuitement
+          </Link>
+          <Link
+            href="/login"
+            className="inline-flex h-9 items-center rounded-[7px] px-4 text-[13px] font-medium transition-colors"
+            style={{
+              color: "rgba(255,255,255,0.55)",
+              border: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            Se connecter
+          </Link>
+        </div>
+
+        {/* Dashboard screenshot placeholder — same frame as Linear */}
+        <div className="relative mt-16">
+          {/* Gradient fade bottom */}
+          <div
+            className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-32"
+            style={{ background: "linear-gradient(to top, #080808, transparent)" }}
+          />
+
+          {/* Frame */}
+          <div
+            className="relative overflow-hidden rounded-t-xl"
+            style={{
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderBottom: "none",
+              background: "rgba(255,255,255,0.02)",
+              boxShadow: "0 0 0 1px rgba(255,255,255,0.04), 0 -40px 100px -20px rgba(139,92,246,0.08)",
+            }}
+          >
+            {/* Browser chrome */}
+            <div
+              className="flex items-center gap-2 px-4 py-3"
+              style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(0,0,0,0.3)" }}
+            >
+              <div className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+              <div className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+              <div className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+              <div
+                className="mx-auto flex h-5 w-48 items-center justify-center rounded-md text-[11px]"
+                style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.3)" }}
+              >
+                app.voyted.app
+              </div>
+            </div>
+
+            {/* Dashboard preview */}
+            <div className="flex h-[380px] items-center justify-center" style={{ background: "rgba(12,12,12,0.8)" }}>
+              <div className="grid w-full max-w-2xl gap-3 px-8 pt-8 opacity-60">
+                {/* Stats row */}
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { label: "Revenu ce mois", value: "1 247 €", color: "#18CB96" },
+                    { label: "Articles en vente", value: "34", color: "rgba(255,255,255,0.7)" },
+                    { label: "Ventes", value: "12", color: "rgba(255,255,255,0.7)" },
+                  ].map((s, i) => (
+                    <div key={i} className="rounded-lg p-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                      <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.3)" }}>{s.label}</p>
+                      <p className="mt-1 text-lg font-bold" style={{ color: s.color }}>{s.value}</p>
+                    </div>
+                  ))}
+                </div>
+                {/* Table rows */}
+                <div className="rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
+                  {["T-shirt Nike • 18 €", "Jean Levi's • 35 €", "Veste Carhartt • 55 €", "Sneakers Vans • 28 €"].map((item, i) => (
+                    <div key={i} className="flex items-center justify-between px-3 py-2" style={{ borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                      <span className="text-[12px]" style={{ color: "rgba(255,255,255,0.5)" }}>{item}</span>
+                      <span className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ background: "rgba(24,203,150,0.1)", color: "#18CB96" }}>En vente</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { box-shadow: 0 0 0 2px rgba(24,203,150,0.25); }
+          50% { box-shadow: 0 0 0 5px rgba(24,203,150,0.1); }
+        }
+      `}</style>
     </section>
   );
 }
