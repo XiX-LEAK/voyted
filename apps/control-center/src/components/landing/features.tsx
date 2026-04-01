@@ -220,6 +220,36 @@ export function LandingFeatures() {
               </div>
               <div className="pointer-events-none absolute inset-0 transition-all duration-300 group-hover:bg-white/[.03]" />
             </div>
+
+            {/* Card 6 — Analytique Globale */}
+            <div className={`${cardClass} col-span-3 lg:col-span-2`}>
+              <div className="relative overflow-hidden h-[200px]">
+                {/* Globe/map visualization */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-30">
+                  <svg viewBox="0 0 400 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                    {/* Grid lines */}
+                    {[0,1,2,3,4].map(i => (
+                      <line key={i} x1="0" y1={i*50} x2="400" y2={i*50} stroke="white" strokeWidth="0.5" strokeOpacity="0.3" />
+                    ))}
+                    {[0,1,2,3,4,5,6,7,8].map(i => (
+                      <line key={i} x1={i*50} y1="0" x2={i*50} y2="200" stroke="white" strokeWidth="0.5" strokeOpacity="0.3" />
+                    ))}
+                    {/* Dots representing countries */}
+                    {[[80,60],[120,80],[200,70],[280,90],[320,60],[160,120],[240,130],[100,140],[180,50],[300,110]].map(([cx,cy], i) => (
+                      <circle key={i} cx={cx} cy={cy} r="4" fill="white" opacity={0.4 + Math.random() * 0.5} />
+                    ))}
+                  </svg>
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="pointer-events-none z-10 flex flex-col gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/80"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                  <h3 className="text-xl font-semibold text-white">Analytique Globale</h3>
+                  <p className="max-w-lg text-neutral-400">Visualise tes ventes à travers l&apos;Europe.</p>
+                </div>
+              </div>
+              <div className="pointer-events-none absolute inset-0 transition-all duration-300 group-hover:bg-white/[.03]" />
+            </div>
           </div>
         </div>
       </div>
